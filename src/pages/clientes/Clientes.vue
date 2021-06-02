@@ -210,6 +210,7 @@ export default {
     mensagem: '',
     colorSnackbar: '',
     nomePesquisa: '',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -224,7 +225,7 @@ export default {
       }
       const result = await axios({
         method: 'POST',
-        url: 'http://localhost:4040/api_htg/clientes',
+        url: `${this.urlProd}clientes`,
         data: params
       })
       this.desserts = result.data
@@ -248,7 +249,7 @@ export default {
         }
         const result = await axios({
           method: 'POST',
-          url: 'http://localhost:4040/api_htg/novo-clientes',
+          url: `${this.urlProd}novo-clientes`,
           data: params
         })
         this.snackbar = true

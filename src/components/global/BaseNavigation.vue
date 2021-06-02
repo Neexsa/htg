@@ -85,7 +85,7 @@ export default {
       items: [
         { title: 'Home', icon: 'mdi-home' },
         // { title: 'Cadastro', icon: 'mdi-account-multiple-plus' },
-        { title: 'Clientes', icon: 'mdi-folder-multiple-plus' },
+        { title: 'Clientes', icon: 'mdi-account-multiple' },
         { title: 'RDO', icon: 'mdi-file-plus' }
       ]
     }

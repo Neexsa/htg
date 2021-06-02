@@ -24,10 +24,10 @@
                 <v-row class="px-5">
                   <v-col
                     cols="12"
-                    sm="4"
-                    md="4"
-                    lg="3"
-                    xs="3"
+                    sm="3"
+                    md="3"
+                    lg="2"
+                    xs="2"
                     class="mt-7"
                   >
                     <v-menu
@@ -61,10 +61,10 @@
                   </v-col>
                   <v-col
                     cols="12"
-                    sm="4"
-                    md="4"
-                    lg="5"
-                    xs="5"
+                    sm="3"
+                    md="3"
+                    lg="2"
+                    xs="2"
                     class="mt-7"
                   >
                     <v-text-field
@@ -77,7 +77,39 @@
                   <v-col
                     cols="12"
                     sm="3"
-                    md="2"
+                    md="3"
+                    lg="2"
+                    xs="2"
+                    class="mt-7"
+                  >
+                    <v-autocomplete
+                      v-model="nomeCliente"
+                      :items="clientes"
+                      label="Cliente"
+                      clearable
+                      @change="getFiltroProjeto(nomeCliente)"
+                    ></v-autocomplete>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="3"
+                    md="3"
+                    lg="2"
+                    xs="2"
+                    class="mt-7"
+                  >
+                    <v-autocomplete
+                      v-model="nomeProjetos"
+                      :items="arrayProjetos"
+                      label="Projetos"
+                      clearable
+                      :disabled="nomeCliente ? false : true"
+                    ></v-autocomplete>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="3"
+                    md="3"
                     lg="2"
                     xs="2"
                     class="mt-7"
@@ -88,7 +120,7 @@
                   <v-col
                     cols="12"
                     sm="3"
-                    md="2"
+                    md="3"
                     lg="2"
                     xs="2"
                     class="mt-7"
@@ -111,12 +143,38 @@
                         :headers="headers"
                         :items="desserts"
                         :items-per-page="5"
-                        class="elevation-1"
+                        class="elevation-1 color-table"
                       >
-                      <template v-slot:items="props">
-                        <tr>
-                          <td>{{props.item.cliente}}</td>
-                        </tr>
+                      <template v-slot:[`item.editar`]="{ item }">
+                        <v-btn
+                          width="30px"
+                          height="30px"
+                          fab
+                          dark
+                          small
+                          color="primary"
+                          @click="rdoNova"
+                        >
+                        <v-icon dark small>
+                          mdi-pencil
+                        </v-icon>{{ item.editar }}
+                        </v-btn>
+                      </template>
+
+                      <template v-slot:[`item.download`]="{ item }">
+                        <v-btn
+                          width="30px"
+                          height="30px"
+                          fab
+                          dark
+                          small
+                          color="orange"
+                          @click="downloadPdf(item.id_rdo)"
+                        >
+                        <v-icon dark small>
+                          mdi-file-pdf
+                        </v-icon>{{ item.download }}
+                        </v-btn>
                       </template>
                       </v-data-table>
                     </template>
@@ -130,6 +188,8 @@
       <novo-rdo
         v-if="showNovoRdo"
         v-on:voltar="voltarRDO()"
+        :tipoRdo="tipoRdo"
+        :rdoEdit="rdoEdit"
       />
     </div>
 </template>
@@ -141,11 +201,20 @@ import NovoRdo from './componente/NovoRdo.vue'
 export default {
   components: { NovoRdo },
   data: () => ({
+    tipoRdo: '',
     showRdo: true,
     showNovoRdo: false,
+    clientes: [],
+    nomeCliente: '',
+    projetos: [],
+    projetosCliente: [],
+    arrayProjetos: [],
+    nomeProjetos: '',
     textoPesquisar: '',
     date: '',
     menu: false,
+    rdoEdit: [],
+    urlProd: 'https://htgneexsa.cf/api_htg/',
     headers: [
       {
         text: 'DataInicio',
@@ -155,32 +224,71 @@ export default {
       },
       {
         text: 'ID RDO',
-        value: 'id_rdo'
+        value: 'id_rdo',
+        align: 'center'
       },
       {
         text: 'Cliente',
-        value: 'cliente'
+        value: 'cliente',
+        align: 'center'
       },
       {
         text: 'Projeto',
-        value: 'projeto'
+        value: 'projeto',
+        align: 'center'
+      },
+      {
+        text: 'Editar',
+        value: 'editar',
+        align: 'center'
+      },
+      {
+        text: 'Download  RDO',
+        value: 'download',
+        align: 'center'
       }
     ],
     desserts: []
   }),
   async created () {
     await this.getRDO()
+    await this.getClientes()
+    await this.getProjetos()
   },
 
   methods: {
-    async getRDO () {
+
+    async downloadPdf (id) {
+      const link = document.createElement('a')
+      link.download = '1622198871951.pdf'
+      link.href = 'C:/Neexsa/server/api_htg/pdf/1622198871951.pdf'
+      link.click()
+      /* console.log(id)
       const params = {
-        dataInicio: moment(this.date).valueOf(),
-        textoPesquisar: this.textoPesquisar
+        id: id
       }
       const result = await axios({
         method: 'POST',
-        url: 'http://localhost:4040/api_htg/rdos',
+        url: `${this.urlProd}aws-pdf`,
+        data: params
+      })
+
+      console.log(result) */
+    },
+
+    async getRDO () {
+      if (this.nomeCliente) {
+        this.nomeProjetos = ''
+      }
+      const params = {
+        dataInicio: moment(this.date).valueOf(),
+        textoPesquisar: this.textoPesquisar,
+        nomeCliente: this.nomeCliente,
+        nomeProjetos: this.nomeProjetos
+      }
+      const result = await axios({
+        method: 'POST',
+        url: `${this.urlProd}rdos`,
         data: params
       })
       this.desserts = result.data.map(item => {
@@ -200,6 +308,35 @@ export default {
     voltarRDO () {
       this.showRdo = true
       this.showNovoRdo = false
+      location.reload()
+    },
+    async getClientes () {
+      const result = await axios({
+        method: 'GET',
+        url: `${this.urlProd}dominio/clientes`
+      })
+      this.clientes = result.data
+    },
+
+    async getProjetos () {
+      const result = await axios({
+        method: 'GET',
+        url: `${this.urlProd}dominio/projetosClientes`
+      })
+      this.projetos = result.data
+    },
+
+    getFiltroProjeto (nome) {
+      this.projetosCliente = this.projetos.filter(item => { return item.cliente.nome === nome })
+
+      this.arrayProjetos = this.projetosCliente.map(x => { return x.projeto.nome })
+    },
+
+    rdoNova (item) {
+      this.rdoEdit = item
+      this.showNovoRdo = true
+      this.showRdo = false
+      this.tipoRdo = 'editar'
     }
   }
 }
@@ -224,5 +361,9 @@ export default {
   .card-home{
     margin-top: -30px;
     z-index: 0;
+  }
+
+  .color-table {
+    background-color: var(--light-gray)!important;
   }
 </style>

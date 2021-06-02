@@ -299,6 +299,7 @@ export default {
     novoNomeProjeto: '',
     snackbar: false,
     textoPesquisar: '',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -340,7 +341,7 @@ export default {
       try {
         const result = await axios({
           method: 'POST',
-          url: 'http://localhost:4040/api_htg/projetos',
+          url: `${this.urlProd}projetos`,
           data: params
         })
         this.desserts = result.data.map(item => {
@@ -372,7 +373,7 @@ export default {
         }
         const result = await axios({
           method: 'POST',
-          url: 'http://localhost:4040/api_htg/novo-projeto',
+          url: `${this.urlProd}novo-projeto`,
           data: params
         })
         this.snackbar = true
@@ -397,7 +398,7 @@ export default {
       try {
         const result = await axios({
           method: 'POST',
-          url: 'http://localhost:4040/api_htg/alterar-status-projeto',
+          url: `${this.urlProd}alterar-status-projeto`,
           data: params
         })
         console.log(result)

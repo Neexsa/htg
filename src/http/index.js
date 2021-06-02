@@ -7,7 +7,7 @@ Vue.use(VueResource)
 
 const http = Vue.http
 
-http.options.root = 'http://15.228.73.93:3030/api_cadastro/'
+http.options.root = 'https://htgneexsa.cf/api_cadastro/'
 // http.options.root = 'http://localhost:3030/api_cadastro/'
 // http.interceptors.push(interceptors)
 
