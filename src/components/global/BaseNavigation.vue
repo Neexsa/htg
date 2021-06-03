@@ -12,7 +12,7 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn icon>
+      <!-- <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
 
@@ -22,7 +22,7 @@
 
       <v-btn icon>
         <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-app-bar>
 
     <v-navigation-drawer
@@ -31,9 +31,17 @@
       temporary
       app
     >
-    <v-layout column>
-      <v-flex class="mt-5">
-        <p class="subheading ma-3">HTG</p>
+    <v-layout column style="text-align: center">
+      <v-flex class="mt-5" >
+        <v-avatar
+          color="indigo"
+          style="text-align: center"
+          size="60">
+          <span class="white--text text-h5">{{user.nome ? user.nome.substr(0, 1) : ''}}</span>
+          <!-- <v-icon dark size="30">
+            mdi-account-circle
+          </v-icon> -->
+        </v-avatar>
         <p class="subheading ma-3">Bem Vindo,</p>
         <p class="subheading ma-3">{{user.nome}}</p>
       </v-flex>

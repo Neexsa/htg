@@ -164,7 +164,7 @@ export default {
     height: 100vh;
   }
   .card-login {
-    width: 50%;
+    width: 100%;
   }
   .text-center {
     text-align: center;

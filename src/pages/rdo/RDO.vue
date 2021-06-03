@@ -5,7 +5,7 @@
           <v-flex sm12 xs12 md12 lg12 class="mt-10">
             <v-card-title class="align-start">
               <v-sheet
-              color="green"
+              color="brown"
               width="100%"
               class="overflow-hidden mt-n9 transition-swing v-card--material__sheet"
               style="z-index: 2"
@@ -23,7 +23,7 @@
               <v-container class="py-0">
                 <v-row class="px-5">
                   <v-col
-                    cols="12"
+                    cols="6"
                     sm="3"
                     md="3"
                     lg="2"
@@ -60,7 +60,7 @@
                     </v-menu>
                   </v-col>
                   <v-col
-                    cols="12"
+                    cols="6"
                     sm="3"
                     md="3"
                     lg="2"
@@ -75,7 +75,7 @@
                     ></v-text-field>
                   </v-col>
                   <v-col
-                    cols="12"
+                    cols="6"
                     sm="3"
                     md="3"
                     lg="2"
@@ -91,7 +91,7 @@
                     ></v-autocomplete>
                   </v-col>
                   <v-col
-                    cols="12"
+                    cols="6"
                     sm="3"
                     md="3"
                     lg="2"
@@ -153,7 +153,7 @@
                           dark
                           small
                           color="primary"
-                          @click="rdoNova"
+                          @click="rdoNova(item)"
                         >
                         <v-icon dark small>
                           mdi-pencil
@@ -215,6 +215,7 @@ export default {
     menu: false,
     rdoEdit: [],
     urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     headers: [
       {
         text: 'DataInicio',
@@ -224,17 +225,17 @@ export default {
       },
       {
         text: 'ID RDO',
-        value: 'id_rdo',
+        value: 'rdo.id_rdo',
         align: 'center'
       },
       {
         text: 'Cliente',
-        value: 'cliente',
+        value: 'rdo.cliente',
         align: 'center'
       },
       {
         text: 'Projeto',
-        value: 'projeto',
+        value: 'rdo.projeto',
         align: 'center'
       },
       {
@@ -294,7 +295,7 @@ export default {
       this.desserts = result.data.map(item => {
         return {
           ...item,
-          dataIncioConfig: moment(item.dataInicioInter).format('DD/MM/YYYY')
+          dataIncioConfig: moment(item.rdo.dataInicio).format('DD/MM/YYYY')
         }
       })
       console.log(this.desserts)

@@ -5,7 +5,7 @@
           <v-flex sm12 xs12 md12 lg12 class="mt-10">
             <v-card-title class="align-start">
               <v-sheet
-              color="green"
+              color="brown"
               width="100%"
               class="overflow-hidden mt-n9 transition-swing v-card--material__sheet"
               style="z-index: 2"
@@ -1377,32 +1377,34 @@ export default {
   props: ['tipoRdo', 'rdoEdit'],
   mounted () {
     if (this.tipoRdo === 'editar') {
-      this.nomeCliente = this.rdoEdit.cliente
-      this.nomeProjetos = this.rdoEdit.projeto
-      this.dataIDRDO = this.rdoEdit.id_rdo
       this.dateFormatted = this.rdoEdit.dataIncioConfig
-      this.areaAtuacao = this.rdoEdit.areaAtuacao
-      this.cartaChamada = this.rdoEdit.cartaChamada
-      this.nomeFiscal = this.rdoEdit.nomeFiscal
-      this.nomeEncarregado = this.rdoEdit.nomeEncarregado
-      this.condicaoManha = this.rdoEdit.condicaoManha
-      this.condicaoTarde = this.rdoEdit.condicaoTarde
-      this.condicaoNoite = this.rdoEdit.condicaoNoite
-      this.prazoAtividade = this.rdoEdit.prazoAtividade
-      this.diasDecorridos = this.rdoEdit.diasDecorridos
-      this.prorrogacao = this.rdoEdit.prorrogacao
-      this.diasRestantes = this.rdoEdit.diasRestantes
-      this.diasDeAtrazos = this.rdoEdit.diasDeAtrazos
-      this.opcoesDDS = this.rdoEdit.opcoesDDS
-      this.opcoesPrejuizo = this.rdoEdit.opcoesPrejuizo
-      this.opcoesViolacao = this.rdoEdit.opcoesViolacao
-      this.opcoesOciosidade = this.rdoEdit.opcoesOciosidade
-      this.servico = this.rdoEdit.servico
-      this.inicioReal = this.rdoEdit.inicioReal
-      this.terminoReal = this.rdoEdit.terminoReal
-      this.inicioPrevisto = this.rdoEdit.inicioPrevisto
-      this.terminoPrevisto = this.rdoEdit.terminoPrevisto
-      this.comentarios = this.rdoEdit.comentarios
+
+      this.nomeCliente = this.rdoEdit.rdo.cliente
+      this.nomeProjetos = this.rdoEdit.rdo.projeto
+      this.dataIDRDO = this.rdoEdit.rdo.id_rdo
+      this.areaAtuacao = this.rdoEdit.rdo.areaAtuacao
+      this.cartaChamada = this.rdoEdit.rdo.cartaChamada
+      this.nomeFiscal = this.rdoEdit.rdo.nomeFiscal
+      this.nomeEncarregado = this.rdoEdit.rdo.nomeEncarregado
+      this.condicaoManha = this.rdoEdit.rdo.condicaoManha
+      this.condicaoTarde = this.rdoEdit.rdo.condicaoTarde
+      this.condicaoNoite = this.rdoEdit.rdo.condicaoNoite
+      this.prazoAtividade = this.rdoEdit.rdo.prazoAtividade
+      this.diasDecorridos = this.rdoEdit.rdo.diasDecorridos
+      this.prorrogacao = this.rdoEdit.rdo.prorrogacao
+      this.diasRestantes = this.rdoEdit.rdo.diasRestantes
+      this.diasDeAtrazos = this.rdoEdit.rdo.diasDeAtrazos
+      this.opcoesDDS = this.rdoEdit.rdo.opcoesDDS
+      this.opcoesPrejuizo = this.rdoEdit.rdo.opcoesPrejuizo
+      this.opcoesViolacao = this.rdoEdit.rdo.opcoesViolacao
+      this.opcoesOciosidade = this.rdoEdit.rdo.opcoesOciosidade
+      this.servico = this.rdoEdit.rdo.servico
+      this.inicioReal = this.rdoEdit.rdo.inicioReal
+      this.terminoReal = this.rdoEdit.rdo.terminoReal
+      this.inicioPrevisto = this.rdoEdit.rdo.inicioPrevisto
+      this.terminoPrevisto = this.rdoEdit.rdo.terminoPrevisto
+      this.comentarios = this.rdoEdit.rdo.comentarios
+
       console.log(this.rdoEdit)
     }
   },
@@ -1722,11 +1724,26 @@ export default {
     },
 
     initialize () {
-      this.desserts = []
+      if (this.tipoRdo === 'editar') {
+        const qtdEfeti = this.rdoEdit.efetivos.length
+        for (let y = 0; y < qtdEfeti; y++) {
+          this.desserts.push(this.rdoEdit.efetivos[y])
+        }
+      } else {
+        this.desserts = []
+      }
     },
 
     initializeAtividade () {
-      this.dessertsAtividade = []
+      if (this.tipoRdo === 'editar') {
+        const qtdAtiv = this.rdoEdit.atividade.length
+        for (let x = 0; x < qtdAtiv; x++) {
+          this.rdoEdit.atividade[x].id = x + 1
+          this.dessertsAtividade.push(this.rdoEdit.atividade[x])
+        }
+      } else {
+        this.dessertsAtividade = []
+      }
     },
 
     editItem (item) {
