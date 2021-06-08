@@ -30,7 +30,13 @@
                     xs="2"
                     class="mt-7"
                   >
-                    <v-menu
+                    <v-text-field
+                        v-model="dataRdoInicio"
+                        readonly
+                        label="Data Inicio"
+                      >
+                    </v-text-field>
+                    <!-- <v-menu
                       ref="menu"
                       v-model="menu"
                       :close-on-content-click="false"
@@ -61,7 +67,7 @@
                         readonly
                       >
                       </v-date-picker>
-                    </v-menu>
+                    </v-menu> -->
                   </v-col>
                   <v-col
                     cols="12"
@@ -1409,7 +1415,8 @@ export default {
     }
   },
   data: vm => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     clientes: [],
     projetos: [],
     projetosCliente: [],
@@ -1539,6 +1546,7 @@ export default {
     nomeProjetos: '',
     dataIDRDO: moment(new Date()).valueOf(),
     dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
+    dataRdoInicio: moment(new Date()).format('L'),
     areaAtuacao: '',
     cartaChamada: '',
     nomeFiscal: '',
@@ -1556,10 +1564,10 @@ export default {
     opcoesViolacao: '',
     opcoesOciosidade: '',
     servico: '',
-    inicioReal: null,
-    terminoReal: null,
-    inicioPrevisto: null,
-    terminoPrevisto: null,
+    inicioReal: 0,
+    terminoReal: 0,
+    inicioPrevisto: 0,
+    terminoPrevisto: 0,
     comentarios: ''
   }),
   async created () {
@@ -1617,7 +1625,7 @@ export default {
     async getClientes () {
       const result = await axios({
         method: 'GET',
-        url: `${this.urlProd}dominio/clientes`
+        url: `${this.urlProd}dominio/clientes-ativos`
       })
       this.clientes = result.data
     },
@@ -1657,60 +1665,84 @@ export default {
     },
 
     getFiltroProjeto (nome) {
-      this.projetosCliente = this.projetos.filter(item => { return item.cliente.nome === nome })
+      console.log(this.projetos)
+      this.projetosCliente = this.projetos.filter(item => {
+        return item.cliente.nome === nome && item.projeto.ativo === true && item.projeto.pausado === false
+      })
 
       this.arrayProjetos = this.projetosCliente.map(x => { return x.projeto.nome })
     },
 
     async salvarRDO () {
       if (this.nomeCliente && this.nomeProjetos) {
-        try {
-          const params = {
-            nomeCliente: this.nomeCliente ? this.nomeCliente : '',
-            nomeProjetos: this.nomeProjetos ? this.nomeProjetos : '',
-            dataRdo: this.dateFormatted ? this.dateFormatted : null,
-            diaSemana: this.diaSemana ? this.diaSemana : '',
-            dateFormatted: this.dateFormatted ? moment(this.dateFormatted).valueOf() : moment(new Date()).valueOf(),
-            dataIDRDO: this.dataIDRDO ? this.dataIDRDO : moment(new Date()).valueOf(),
-            areaAtuacao: this.areaAtuacao,
-            cartaChamada: this.cartaChamada,
-            nomeFiscal: this.nomeFiscal,
-            nomeEncarregado: this.nomeEncarregado,
-            condicaoManha: this.condicaoManha,
-            condicaoTarde: this.condicaoTarde,
-            condicaoNoite: this.condicaoNoite,
-            prazoAtividade: parseInt(this.prazoAtividade),
-            diasDecorridos: parseInt(this.diasDecorridos),
-            prorrogacao: parseInt(this.prorrogacao),
-            diasRestantes: parseInt(this.diasRestantes),
-            diasDeAtrazos: parseInt(this.diasDeAtrazos),
-            opcoesDDS: this.opcoesDDS,
-            opcoesPrejuizo: this.opcoesPrejuizo,
-            opcoesViolacao: this.opcoesViolacao,
-            opcoesOciosidade: this.opcoesOciosidade,
-            servico: this.servico,
-            inicioReal: this.inicioReal,
-            terminoReal: this.terminoReal,
-            inicioPrevisto: this.inicioPrevisto,
-            terminoPrevisto: this.terminoPrevisto,
-            comentarios: this.comentarios,
-            efetivos: this.desserts,
-            atividades: this.dessertsAtividade
+        console.log(new Date(this.dataRdoInicio).valueOf())
+        const params = {
+          nomeCliente: this.nomeCliente ? this.nomeCliente : '',
+          nomeProjetos: this.nomeProjetos ? this.nomeProjetos : '',
+          dataRdo: this.dataRdoInicio ? this.dataRdoInicio : null,
+          diaSemana: this.diaSemana ? this.diaSemana : '',
+          dateFormatted: this.dataRdoInicio ? moment(this.dataRdoInicio).valueOf() : moment(new Date()).valueOf(),
+          dataIDRDO: this.dataIDRDO ? this.dataIDRDO : moment(new Date()).valueOf(),
+          areaAtuacao: this.areaAtuacao,
+          cartaChamada: this.cartaChamada,
+          nomeFiscal: this.nomeFiscal,
+          nomeEncarregado: this.nomeEncarregado,
+          condicaoManha: this.condicaoManha,
+          condicaoTarde: this.condicaoTarde,
+          condicaoNoite: this.condicaoNoite,
+          prazoAtividade: parseInt(this.prazoAtividade),
+          diasDecorridos: parseInt(this.diasDecorridos),
+          prorrogacao: parseInt(this.prorrogacao),
+          diasRestantes: parseInt(this.diasRestantes),
+          diasDeAtrazos: parseInt(this.diasDeAtrazos),
+          opcoesDDS: this.opcoesDDS,
+          opcoesPrejuizo: this.opcoesPrejuizo,
+          opcoesViolacao: this.opcoesViolacao,
+          opcoesOciosidade: this.opcoesOciosidade,
+          servico: this.servico,
+          inicioReal: this.inicioReal,
+          terminoReal: this.terminoReal,
+          inicioPrevisto: this.inicioPrevisto,
+          terminoPrevisto: this.terminoPrevisto,
+          comentarios: this.comentarios,
+          efetivos: this.desserts,
+          atividades: this.dessertsAtividade
+        }
+        if (this.tipoRdo === 'editar') {
+          console.log(this.tipoRdo, params)
+          try {
+            const result = await axios({
+              method: 'POST',
+              url: `${this.urlProd}editar-rdo`,
+              data: params
+            })
+            this.snackbar = true
+            this.mensagem = result.data.mensagem
+            this.colorSnackbar = 'green'
+            location.reload()
+          } catch (err) {
+            console.log(err)
+            this.snackbar = true
+            this.mensagem = 'Erro ao salvar!!!'
+            this.colorSnackbar = 'red'
           }
-          const result = await axios({
-            method: 'POST',
-            url: `${this.urlProd}novo-rdo`,
-            data: params
-          })
-          this.snackbar = true
-          this.mensagem = result.data.mensagem
-          this.colorSnackbar = 'green'
-          location.reload()
-        } catch (err) {
-          console.log(err)
-          this.snackbar = true
-          this.mensagem = 'Erro ao salvar!!!'
-          this.colorSnackbar = 'red'
+        } else {
+          try {
+            const result = await axios({
+              method: 'POST',
+              url: `${this.urlProd}novo-rdo`,
+              data: params
+            })
+            this.snackbar = true
+            this.mensagem = result.data.mensagem
+            this.colorSnackbar = 'green'
+            location.reload()
+          } catch (err) {
+            console.log(err)
+            this.snackbar = true
+            this.mensagem = 'Erro ao salvar!!!'
+            this.colorSnackbar = 'red'
+          }
         }
       } else {
         this.snackbar = true

@@ -169,7 +169,7 @@
                           dark
                           small
                           color="orange"
-                          @click="downloadPdf(item.id_rdo)"
+                          @click="downloadPdf(item.rdo.id_rdo)"
                         >
                         <v-icon dark small>
                           mdi-file-pdf
@@ -214,8 +214,8 @@ export default {
     date: '',
     menu: false,
     rdoEdit: [],
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     headers: [
       {
         text: 'DataInicio',
@@ -260,11 +260,7 @@ export default {
   methods: {
 
     async downloadPdf (id) {
-      const link = document.createElement('a')
-      link.download = '1622198871951.pdf'
-      link.href = 'C:/Neexsa/server/api_htg/pdf/1622198871951.pdf'
-      link.click()
-      /* console.log(id)
+      console.log(id)
       const params = {
         id: id
       }
@@ -274,7 +270,7 @@ export default {
         data: params
       })
 
-      console.log(result) */
+      window.open(result.data, '_blank')
     },
 
     async getRDO () {
@@ -314,7 +310,7 @@ export default {
     async getClientes () {
       const result = await axios({
         method: 'GET',
-        url: `${this.urlProd}dominio/clientes`
+        url: `${this.urlProd}dominio/clientes-ativos`
       })
       this.clientes = result.data
     },

@@ -100,8 +100,8 @@ import moment from 'moment'
 export default {
   name: 'Home',
   data: () => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     qtdClientes: 0,
     qtdProjetosAtivos: 0,
     qtdRdo: 0
@@ -118,7 +118,7 @@ export default {
     async getCliente () {
       const result = await axios({
         method: 'GET',
-        url: `${this.urlProd}dominio/clientes`
+        url: `${this.urlProd}dominio/clientes-ativos`
       })
       this.qtdClientes = result.data.length
     },
@@ -134,8 +134,9 @@ export default {
 
     async getRdoFeitoDia () {
       const paramsRDO = {
-        dataHora: moment(new Date()).valueOf()
+        dataHora: moment(new Date()).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).valueOf()
       }
+      console.log(paramsRDO)
       const resultRDO = await axios({
         method: 'POST',
         url: `${this.urlProd}rdo-do-dia`,

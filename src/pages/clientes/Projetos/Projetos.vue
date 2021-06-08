@@ -299,7 +299,8 @@ export default {
     novoNomeProjeto: '',
     snackbar: false,
     textoPesquisar: '',
-    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -402,10 +403,17 @@ export default {
           data: params
         })
         console.log(result)
-        this.snackbar = true
-        this.mensagem = result.data.mensagem
-        this.colorSnackbar = 'green'
-        location.reload()
+        if (result.data.cliente && result.data.cliente.length > 0) {
+          this.snackbar = true
+          this.mensagem = result.data.mensagem + ': ' + result.data.cliente
+          this.colorSnackbar = 'red'
+          this.dialogCliente = false
+        } else {
+          this.snackbar = true
+          this.mensagem = result.data.mensagem
+          this.colorSnackbar = 'green'
+          location.reload()
+        }
       } catch (err) {
         console.log(err)
         this.snackbar = true

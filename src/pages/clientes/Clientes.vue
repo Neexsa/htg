@@ -74,11 +74,20 @@
                                 <th class="text-left">
                                   Nome dos Clientes
                                 </th>
-                                <th class="text-left">
-                                  Quantidade de Projetos
+                                <th class="text-center">
+                                  Qtd. Projetos Ativos
+                                </th>
+                                <th class="text-center">
+                                  Qtd. Projetos Pausados
                                 </th>
                                 <th class="text-center">
                                   Projetos
+                                </th>
+                                <th class="text-center">
+                                  Desativar / Ativar Cliente
+                                </th>
+                                <th class="text-center">
+                                  Excluir Cliente
                                 </th>
                               </tr>
                             </thead>
@@ -86,11 +95,11 @@
                               <tr
                                 v-for="item in desserts"
                                 :key="item.cliente.nome"
-                                @click="showProjeto(item.cliente.nome)"
                               >
-                                <td class="click-projetos">{{ item.cliente.nome }}</td>
-                                <td class="click-projetos">{{ item.quantidadeProjetos }}</td>
-                                <td class="click-projetos text-center">
+                                <td>{{ item.cliente.nome }}</td>
+                                <td class="text-center" style="width: 25%">{{ item.quantidadeProjetos }}</td>
+                                <td class="text-center" style="width: 25%">{{ item.quantidadeProjetos }}</td>
+                                <td class="text-center" style="width: 10%">
                                   <v-btn
                                     width="30px"
                                     height="30px"
@@ -98,9 +107,39 @@
                                     dark
                                     small
                                     color="primary"
+                                    @click="showProjeto(item.cliente.nome)"
                                   >
                                     <v-icon dark small>
                                       mdi-dots-vertical
+                                    </v-icon>
+                                  </v-btn>
+                                </td>
+                                <td class="text-center" style="width: 12%">
+                                  <v-btn
+                                    width="30px"
+                                    height="30px"
+                                    fab
+                                    dark
+                                    small
+                                    :color="item.cliente.ativo ? 'orange' : 'green'"
+                                    @click="alterarStatusCliente(item.cliente.nome, item.cliente.ativo)"
+                                  >
+                                    <v-icon dark small v-if="item.cliente.ativo === false">mdi-play</v-icon>
+                                    <v-icon dark small v-else>mdi-pause</v-icon>
+                                  </v-btn>
+                                </td>
+                                <td class="text-center" style="width: 10%">
+                                  <v-btn
+                                    width="30px"
+                                    height="30px"
+                                    fab
+                                    dark
+                                    small
+                                    color="red"
+                                    @click="deleteCliente(item.cliente.nome)"
+                                  >
+                                    <v-icon dark small>
+                                      mdi-close
                                     </v-icon>
                                   </v-btn>
                                 </td>
@@ -210,7 +249,8 @@ export default {
     mensagem: '',
     colorSnackbar: '',
     nomePesquisa: '',
-    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -229,6 +269,7 @@ export default {
         data: params
       })
       this.desserts = result.data
+      console.log(this.desserts)
     },
 
     showProjeto (nome) {
@@ -261,6 +302,60 @@ export default {
         this.snackbar = true
         this.mensagem = 'Preencha o Campo Nome do Cliente'
         this.colorSnackbar = 'red'
+      }
+    },
+
+    async deleteCliente (nome) {
+      const params = {
+        nomeCliente: nome
+      }
+      const result = await axios({
+        method: 'POST',
+        url: `${this.urlProd}delete-clientes`,
+        data: params
+      })
+      console.log(result)
+      if (result.data.projeto && result.data.projeto.length > 0) {
+        this.snackbar = true
+        this.mensagem = result.data.mensagem + ': ' + result.data.projeto
+        this.colorSnackbar = 'red'
+        this.dialogCliente = false
+      } else {
+        console.log(result.data.mensagem)
+        this.snackbar = true
+        this.mensagem = result.data.mensagem
+        this.colorSnackbar = 'green'
+        this.dialogCliente = false
+        location.reload()
+      }
+    },
+
+    async alterarStatusCliente (nome, status) {
+      const statusAgora = !status
+      console.log(nome, statusAgora)
+
+      const params = {
+        nomeCliente: nome,
+        status: statusAgora
+      }
+      const result = await axios({
+        method: 'POST',
+        url: `${this.urlProd}alterar-status-clientes`,
+        data: params
+      })
+      console.log(result)
+      if (result.data.projeto && result.data.projeto.length > 0) {
+        this.snackbar = true
+        this.mensagem = result.data.mensagem + ': ' + result.data.projeto
+        this.colorSnackbar = 'red'
+        this.dialogCliente = false
+      } else {
+        console.log(result.data.mensagem)
+        this.snackbar = true
+        this.mensagem = result.data.mensagem
+        this.colorSnackbar = 'green'
+        this.dialogCliente = false
+        location.reload()
       }
     }
   }
