@@ -1415,8 +1415,8 @@ export default {
     }
   },
   data: vm => ({
-    // urlProd: 'https://htgneexsa.cf/api_htg/',
-    urlProd: 'http://localhost:4040/api_htg/',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     clientes: [],
     projetos: [],
     projetosCliente: [],
@@ -1719,7 +1719,7 @@ export default {
             this.snackbar = true
             this.mensagem = result.data.mensagem
             this.colorSnackbar = 'green'
-            location.reload()
+            this.returnRDO()
           } catch (err) {
             console.log(err)
             this.snackbar = true
@@ -1736,7 +1736,7 @@ export default {
             this.snackbar = true
             this.mensagem = result.data.mensagem
             this.colorSnackbar = 'green'
-            location.reload()
+            this.returnRDO()
           } catch (err) {
             console.log(err)
             this.snackbar = true

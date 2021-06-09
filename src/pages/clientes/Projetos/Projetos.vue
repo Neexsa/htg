@@ -299,8 +299,8 @@ export default {
     novoNomeProjeto: '',
     snackbar: false,
     textoPesquisar: '',
-    // urlProd: 'https://htgneexsa.cf/api_htg/',
-    urlProd: 'http://localhost:4040/api_htg/',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -381,7 +381,7 @@ export default {
         this.mensagem = result.data.mensagem
         this.colorSnackbar = 'green'
         this.dialogCliente = false
-        location.reload()
+        this.getProjetos()
       } else {
         this.snackbar = true
         this.mensagem = 'Preencha o Campo Nome do Cliente e a Data'
@@ -412,7 +412,7 @@ export default {
           this.snackbar = true
           this.mensagem = result.data.mensagem
           this.colorSnackbar = 'green'
-          location.reload()
+          this.getProjetos()
         }
       } catch (err) {
         console.log(err)

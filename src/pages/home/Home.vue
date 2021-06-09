@@ -100,8 +100,8 @@ import moment from 'moment'
 export default {
   name: 'Home',
   data: () => ({
-    // urlProd: 'https://htgneexsa.cf/api_htg/',
-    urlProd: 'http://localhost:4040/api_htg/',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     qtdClientes: 0,
     qtdProjetosAtivos: 0,
     qtdRdo: 0

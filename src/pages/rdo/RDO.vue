@@ -214,8 +214,8 @@ export default {
     date: '',
     menu: false,
     rdoEdit: [],
-    // urlProd: 'https://htgneexsa.cf/api_htg/',
-    urlProd: 'http://localhost:4040/api_htg/',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     headers: [
       {
         text: 'DataInicio',
@@ -305,7 +305,8 @@ export default {
     voltarRDO () {
       this.showRdo = true
       this.showNovoRdo = false
-      location.reload()
+      this.getRDO()
+      // this.$router.push({ name: 'RDO' })
     },
     async getClientes () {
       const result = await axios({

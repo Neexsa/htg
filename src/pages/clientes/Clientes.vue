@@ -249,8 +249,8 @@ export default {
     mensagem: '',
     colorSnackbar: '',
     nomePesquisa: '',
-    // urlProd: 'https://htgneexsa.cf/api_htg/',
-    urlProd: 'http://localhost:4040/api_htg/',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -281,6 +281,7 @@ export default {
     returnClientes () {
       this.showProjetos = false
       this.showClientes = true
+      // Atualizar a tabela
     },
 
     async verificarFormulario () {
@@ -297,7 +298,8 @@ export default {
         this.mensagem = result.data.mensagem
         this.colorSnackbar = 'green'
         this.dialogCliente = false
-        location.reload()
+        this.getCliente()
+        // Atualizar so a tabela
       } else {
         this.snackbar = true
         this.mensagem = 'Preencha o Campo Nome do Cliente'
@@ -326,7 +328,8 @@ export default {
         this.mensagem = result.data.mensagem
         this.colorSnackbar = 'green'
         this.dialogCliente = false
-        location.reload()
+        this.getCliente()
+        // Atualizar so a tabela
       }
     },
 
@@ -355,7 +358,8 @@ export default {
         this.mensagem = result.data.mensagem
         this.colorSnackbar = 'green'
         this.dialogCliente = false
-        location.reload()
+        this.getCliente()
+        // Atualizar so a Tabela
       }
     }
   }
