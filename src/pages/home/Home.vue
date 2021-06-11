@@ -34,7 +34,7 @@
                           <v-list-item  >
 
                             <v-sheet color="blue" width="80" height="80" elevation="10" rounded class="ajuste-sheet">
-                              <v-icon dark large class="icon-alien">mdi-account-group</v-icon>
+                              <v-icon dark large class="icon-alien">mdi-factory</v-icon>
                             </v-sheet>
 
                             <v-list-item-content>
@@ -55,7 +55,7 @@
                       <v-card class="ma-3">
                           <v-list-item  >
                             <v-sheet color="red" width="80" height="80" elevation="10" rounded class="ajuste-sheet">
-                              <v-icon dark large class="icon-alien">mdi-account-group</v-icon>
+                              <v-icon dark large class="icon-alien">mdi-file-multiple</v-icon>
                             </v-sheet>
                             <v-list-item-content>
                               <div class="overline text-right">Projetos Ativos</div>
@@ -75,7 +75,7 @@
                       <v-card class="ma-3">
                           <v-list-item  >
                             <v-sheet color="orange" width="80" height="80" elevation="10" rounded class="ajuste-sheet">
-                              <v-icon dark large class="icon-alien">mdi-folder-text</v-icon>
+                              <v-icon dark large class="icon-alien">mdi-file-pdf</v-icon>
                             </v-sheet>
                             <v-list-item-content>
                               <div class="overline text-right">RDO Feitas no Dia</div>
@@ -126,7 +126,7 @@ export default {
     async getProjetosAtivos () {
       const result = await axios({
         method: 'GET',
-        url: `${this.urlProd}dominio/projetosClientes`
+        url: `${this.urlProd}dominio/projetos-clientes`
       })
       const resultFilter = result.data.filter(item => item.projeto.ativo === true && item.projeto.pausado === false)
       this.qtdProjetosAtivos = resultFilter.length

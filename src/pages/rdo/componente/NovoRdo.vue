@@ -19,1338 +19,1340 @@
                 </v-theme-provider>
               </v-sheet>
             </v-card-title>
-            <v-card class="card-home">
-              <v-container class="py-0">
-                <v-row class="px-5 d-flex justify-center">
-                  <v-col
-                    cols="12"
-                    sm="4"
-                    md="4"
-                    lg="2"
-                    xs="2"
-                    class="mt-7"
-                  >
-                    <v-text-field
-                        v-model="dataRdoInicio"
-                        readonly
-                        label="Data Inicio"
-                      >
-                    </v-text-field>
-                    <!-- <v-menu
-                      ref="menu"
-                      v-model="menu"
-                      :close-on-content-click="false"
-                      transition="scale-transition"
-                      offset-y
-                      min-width="auto"
-                      readonly
+            <div id='photo' ref="printMe">
+              <v-card class="card-home">
+                <v-container class="py-0">
+                  <v-row class="px-5 d-flex justify-center">
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                      lg="2"
+                      xs="2"
+                      class="mt-7"
                     >
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-text-field
-                          v-model="dateFormatted"
-                          label="Data Inicio"
-                          prepend-icon="mdi-calendar"
-
+                      <v-text-field
+                          v-model="dataRdoInicio"
                           readonly
-                          v-bind="attrs"
-                          @blur="date = parseDate(dateFormatted)"
-                          v-on="on"
-                        ></v-text-field>
-                      </template>
-                      <v-date-picker
-                        v-model="date"
-                        :first-day-of-week="0"
-                        locale="pt-bt"
-                        no-title
-                        scrollable
-                        @input="menu = false"
+                          label="Data Inicio"
+                        >
+                      </v-text-field>
+                      <!-- <v-menu
+                        ref="menu"
+                        v-model="menu"
+                        :close-on-content-click="false"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="auto"
                         readonly
                       >
-                      </v-date-picker>
-                    </v-menu> -->
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="4"
-                    md="4"
-                    lg="2"
-                    xs="2"
-                    class="mt-7"
-                  >
-                    <v-text-field
-                      v-model="diaSemana"
-                      readonly
-                      label="Dia da Semana"
-                    >
-                    </v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="4"
-                    md="4"
-                    lg="2"
-                    xs="2"
-                    class="mt-7"
-                  >
-                    <v-text-field
-                      label="ID / RDO"
-                      v-model="dataIDRDO"
-                      readonly
-                    >
-                    </v-text-field>
-                  </v-col>
-                </v-row>
-                <v-row class="px-5 py-2">
-                  <v-col
-                    cols="12"
-                    md="12"
-                    lg="12"
-                    sm="12"
-                    xs="12"
-                  >
-                    <v-card class="color-card">
-                      <v-row class="px-5">
-                        <v-col
-                          cols="12"
-                          sm="12"
-                          md="12"
-                          lg="12"
-                          xs="12"
-                          class="pt-5 pb-0"
-                        >
-                        <h4>Informações do Projeto:</h4>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                        >
-                          <v-autocomplete
-                            v-if="tipoRdo !== 'editar'"
-                            v-model="nomeCliente"
-                            :items="clientes"
-                            label="Cliente"
-                            clearable
-                            solo
-
-                            @change="getFiltroProjeto(nomeCliente)"
-                          ></v-autocomplete>
+                        <template v-slot:activator="{ on, attrs }">
                           <v-text-field
-                            v-if="tipoRdo === 'editar'"
-                            v-model="nomeCliente"
-                            label="Cliente"
-                            solo
-                            disabled
-                          >
-                          </v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                        >
-                          <v-autocomplete
-                          v-if="tipoRdo !== 'editar'"
-                            v-model="nomeProjetos"
-                            :items="arrayProjetos"
-                            label="Projetos"
-                            clearable
-                            solo
+                            v-model="dateFormatted"
+                            label="Data Inicio"
+                            prepend-icon="mdi-calendar"
 
-                            :disabled="nomeCliente ? false : true"
-                          ></v-autocomplete>
-                          <v-text-field
-                            v-if="tipoRdo === 'editar'"
-                            v-model="nomeProjetos"
-                            label="Projetos"
-                            solo
-                            disabled
-                          >
-                          </v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                        >
-                          <v-text-field
-                            v-model="areaAtuacao"
-                            label="Area de Atuação"
-                            solo
-
-                          >
-                          </v-text-field>
-                        </v-col>
-                      </v-row >
-
-                      <v-row class="px-5">
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                        >
-                          <v-text-field
-                            v-model="cartaChamada"
-                            label="Carta Chamada"
-                            solo
-
-                          >
-                          </v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                        >
-                          <v-autocomplete
-                            v-model="nomeFiscal"
-                            :items="arrayFiscal"
-                            label="Fiscal"
-                            clearable
-                            solo
-
-                          ></v-autocomplete>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                        >
-                          <v-autocomplete
-                            v-model="nomeEncarregado"
-                            :items="arrayColaboradores"
-                            label="Encarregado"
-                            clearable
-                            solo
-
-                          ></v-autocomplete>
-                        </v-col>
-                      </v-row>
-                      <v-divider class="mx-5"></v-divider>
-                      <v-row class="px-5 d-flex justify-center pt-5">
-                        <v-col
-                          cols="12"
-                          sm="12"
-                          md="12"
-                          lg="12"
-                          xs="12"
-                          class="pb-0"
-                        >
-                        <h4>Informações do Projeto:</h4>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                          <span>Prazo Da Atividade</span>
-                          <v-text-field
-                            v-model="prazoAtividade"
-                            label="Prazo Da Atividade"
-                            solo
-                            class="pt-2"
-                          >
-                          </v-text-field>
-                        </v-col>
-
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                          <span>Dias Decorridos</span>
-                          <v-text-field
-                            v-model="diasDecorridos"
-                            label="Dias Decorridos"
-                            solo
-                            class="pt-2"
-                          >
-                          </v-text-field>
-                        </v-col>
-
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                          <span>Prorrogação</span>
-                          <v-text-field
-                            v-model="prorrogacao"
-                            label="Prorrogação"
-                            solo
-                            class="pt-2"
-                          >
-                          </v-text-field>
-                        </v-col>
-
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                          <span>Dias Restantes</span>
-                          <v-text-field
-                            v-model="diasRestantes"
-                            label="Dias Restantes"
-                            solo
-                            class="pt-2"
-                          >
-                          </v-text-field>
-                        </v-col>
-
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                          <span>Dias De Atrazo</span>
-                          <v-text-field
-                            v-model="diasDeAtrazos"
-                            label="Dias De Atrazo"
-                            solo
-                            class="pt-2"
-                          >
-                          </v-text-field>
-                        </v-col>
-                      </v-row>
-                      <v-divider class="mx-5"></v-divider>
-                      <v-row class="px-5 d-flex justify-center pt-5">
-                        <v-col
-                          cols="12"
-                          sm="12"
-                          md="12"
-                          lg="12"
-                          xs="12"
-                          class="pb-0"
-                        >
-                        <h4>Condição do Tempo:</h4>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="3"
-                          md="3"
-                          lg="2"
-                          xs="2"
-                          style="text-align:center"
-                        >
-                        <h4>Manhã</h4>
-                        <v-select
-                          v-model="condicaoManha"
-                          label="Condição"
-                          :items="condicao"
-
-                          solo
-                          clearable
-                          class="pt-2"
-                        >
-                        </v-select>
-                        </v-col>
-
-                        <v-col
-                          cols="12"
-                          sm="3"
-                          md="3"
-                          lg="2"
-                          xs="2"
-                          style="text-align:center"
-                        >
-                        <h4>Tarde</h4>
-                        <v-select
-                          v-model="condicaoTarde"
-                          label="Condição"
-                          :items="condicao"
-
-                          solo
-                          clearable
-                          class="pt-2"
-                        >
-                        </v-select>
-                        </v-col>
-
-                        <v-col
-                          cols="12"
-                          sm="3"
-                          md="3"
-                          lg="2"
-                          xs="2"
-                          style="text-align:center"
-                        >
-                        <h4>Noite</h4>
-                        <v-select
-                          v-model="condicaoNoite"
-                          label="Condição"
-                          :items="condicao"
-
-                          solo
-                          clearable
-                          class="pt-2"
-                        >
-                        </v-select>
-                        </v-col>
-                      </v-row>
-                    </v-card>
-                  </v-col>
-                </v-row>
-
-                <v-row class="px-5 py-2">
-                  <v-col
-                    cols="12"
-                    md="12"
-                    lg="12"
-                    sm="12"
-                    xs="12"
-                  >
-                    <v-card class="color-card">
-                      <v-row>
-                        <v-col
-                          cols="12"
-                          md="12"
-                          lg="12"
-                          sm="12"
-                          xs="12"
-                          class="text-center"
-                        >
-                          <h4>EFETIVOS</h4>
-                        </v-col>
-                      </v-row>
-                      <v-row class="px-5">
-                        <v-col
-                          cols="12"
-                          md="12"
-                          lg="12"
-                          sm="12"
-                          xs="12"
-                          class="text-center"
-                        >
-                        <v-data-table
-                          :headers="headers"
-                          :items="desserts"
-                          sort-by="horaNormalInicio"
-                          class="elevation-1"
-                        >
-                          <template v-slot:top>
-                            <v-toolbar
-                              flat
-                            >
-                              <v-toolbar-title>Mão de obra direta</v-toolbar-title>
-                              <v-divider
-                                class="mx-4"
-                                inset
-                                vertical
-                              ></v-divider>
-                              <v-spacer></v-spacer>
-                              <v-dialog
-                                v-model="dialog"
-                                max-width="500px"
-                              >
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    color="primary"
-                                    dark
-                                    class="mb-2"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                  >
-                                    Adicionar Efetivo
-                                  </v-btn>
-                                </template>
-                                <v-card>
-                                  <v-card-title>
-                                    <span class="headline">{{ formTitle }}</span>
-                                  </v-card-title>
-
-                                  <v-card-text>
-                                    <v-container>
-                                      <v-row>
-                                        <v-col
-                                          cols="12"
-                                          sm="12"
-                                          md="12"
-                                        >
-                                          <v-autocomplete
-                                            v-model="editedItem.name"
-                                            :items="arrayColaboradores"
-                                            label="Encarregado"
-                                            @change="ajusteNome()"
-                                            clearable
-                                          ></v-autocomplete>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="12"
-                                          md="12"
-                                        >
-                                        <h4>Hora Normal</h4>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalInicio"
-                                            label="Início"
-                                            @change="horaNormal()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalTermino"
-                                            label="Término"
-                                            @change="horaNormal()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalTotal"
-                                            label="Total"
-                                            disabled
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="12"
-                                          md="12"
-                                        >
-                                          <h4>Hora Extra Seg A Sáb</h4>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalExtraInicio"
-                                            label="Início"
-                                            @change="horaNormalExtra()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalExtraTermino"
-                                            label="Termino"
-                                            @change="horaNormalExtra()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalExtraTotal"
-                                            label="Total"
-                                            disabled
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="12"
-                                          md="12"
-                                        >
-                                          <h4>Hora Normal Noturna</h4>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalNoturnaInicio"
-                                            label="Início"
-                                            @change="horaNormalNoturna()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalNoturnaTermino"
-                                            label="Termino"
-                                            @change="horaNormalNoturna()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaNormalNoturnaTotal"
-                                            label="Total"
-                                            disabled
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="12"
-                                          md="12"
-                                        >
-                                          <h4>Hora Extra Noturna</h4>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaExtraNoturnaInicio"
-                                            label="Início"
-                                            @change="horaExtraNoturna()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaExtraNoturnaTermino"
-                                            label="Termino"
-                                            @change="horaExtraNoturna()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaExtraNoturnaTotal"
-                                            label="Total"
-                                            disabled
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="12"
-                                          md="12"
-                                        >
-                                          <h4>Hora Extra Dom e Feriado</h4>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaExtraFdsInicio"
-                                            label="Início"
-                                            @change="horaExtraFds()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaExtraFdsTermino"
-                                            label="Termino"
-                                            @change="horaExtraFds()"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItem.horaExtraFdsTotal"
-                                            label="Total"
-                                            disabled
-                                          ></v-text-field>
-                                        </v-col>
-                                      </v-row>
-                                    </v-container>
-                                  </v-card-text>
-
-                                  <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                      color="blue darken-1"
-                                      text
-                                      @click="close"
-                                    >
-                                      Cancel
-                                    </v-btn>
-                                    <v-btn
-                                      color="green darken-1"
-                                      text
-                                      @click="save"
-                                    >
-                                      Salvar
-                                    </v-btn>
-                                  </v-card-actions>
-                                </v-card>
-                              </v-dialog>
-                              <v-dialog v-model="dialogDelete" max-width="500px">
-                                <v-card>
-                                  <v-card-title class="headline">Tem certeza que vai excluir?</v-card-title>
-                                  <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                                    <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-                                    <v-spacer></v-spacer>
-                                  </v-card-actions>
-                                </v-card>
-                              </v-dialog>
-                            </v-toolbar>
-                          </template>
-                          <template v-slot:[`item.actions`]="{ item }">
-                            <v-icon
-                              small
-                              class="mr-2"
-                              @click="editItem(item)"
-                            >
-                              mdi-pencil
-                            </v-icon>
-                            <v-icon
-                              small
-                              @click="deleteItem(item)"
-                            >
-                              mdi-delete
-                            </v-icon>
-                          </template>
-                        </v-data-table>
-                        </v-col>
-                      </v-row>
-                    </v-card>
-                  </v-col>
-                </v-row>
-
-                <v-row class="px-5 py-2">
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                    lg="12"
-                    xs="12"
-                  >
-                  <v-card class="color-card px-5">
-                      <v-row>
-                        <v-col
-                          cols="12"
-                          md="12"
-                          lg="12"
-                          sm="12"
-                          xs="12"
-                        >
-                          <h4>Observações</h4>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="8"
-                          md="8"
-                          lg="8"
-                          xs="8"
-                          class="py-0"
-                        >
-                          <v-text-field
-                            label="Houve DDS neste dia?"
-                            solo
-                            disabled
-                          >
-                          </v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                          class="py-0"
-                        >
-                          <v-select
-                          v-model="opcoesDDS"
-                          label="Sim / Não"
-                          :items="opcoes"
-                          solo
-                          clearable
-                        >
-                        </v-select>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="8"
-                          md="8"
-                          lg="8"
-                          xs="8"
-                          class="py-0"
-                        >
-                          <v-text-field
-                            label="Houve algum prejuízo material ou de equipamento neste dia?"
-                            solo
-                            disabled
-                          >
-                          </v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                          class="py-0"
-                        >
-                          <v-select
-                          v-model="opcoesPrejuizo"
-                          label="Sim / Não"
-                          :items="opcoes"
-                          solo
-                          clearable
-                        >
-                        </v-select>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="8"
-                          md="8"
-                          lg="8"
-                          xs="8"
-                          class="py-0"
-                        >
-                          <v-text-field
-                            label="Houve violações de segurança neste dia?"
-                            solo
-                            disabled
-                          >
-                          </v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                          class="py-0"
-                        >
-                          <v-select
-                          v-model="opcoesViolacao"
-                          label="Sim / Não"
-                          :items="opcoes"
-                          solo
-                          clearable
-                        >
-                        </v-select>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="8"
-                          md="8"
-                          lg="8"
-                          xs="8"
-                          class="py-0"
-                        >
-                          <v-text-field
-                            label="Houve ociosidade ocorrida por acidentes neste dia?"
-                            solo
-                            disabled
-                          >
-                          </v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                          class="py-0"
-                        >
-                          <v-select
-                          v-model="opcoesOciosidade"
-                          label="Sim / Não"
-                          :items="opcoes"
-                          solo
-                          clearable
-                        >
-                        </v-select>
-                        </v-col>
-                      </v-row>
-                  </v-card>
-                  </v-col>
-                </v-row>
-
-                <v-row class="px-5 py-2">
-                  <v-col
-                    cols="12"
-                    md="12"
-                    lg="12"
-                    sm="12"
-                    xs="12"
-                  >
-                    <v-card class="color-card">
-                      <v-row class="px-5">
-                        <v-col
-                          cols="12"
-                          md="12"
-                          lg="12"
-                          sm="12"
-                          xs="12"
-                          class="text-center"
-                        >
-                          <h4>ATIVIDADES EM EXECUÇÃO</h4>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="4"
-                          xs="4"
-                        >
-                          <span class="pl-2">Serviço: </span>
-                          <v-text-field
-                            v-model="servico"
-                            label="Serviço"
-                            class="pt-2"
-                            solo
+                            readonly
+                            v-bind="attrs"
+                            @blur="date = parseDate(dateFormatted)"
+                            v-on="on"
                           ></v-text-field>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
+                        </template>
+                        <v-date-picker
+                          v-model="date"
+                          :first-day-of-week="0"
+                          locale="pt-bt"
+                          no-title
+                          scrollable
+                          @input="menu = false"
+                          readonly
                         >
-                        <span class="pl-2">Início Previsto: </span>
-                        <v-menu
-                          ref="menu"
-                          v-model="menu2"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          :return-value.sync="inicioPrevisto"
-                          transition="scale-transition"
-                          offset-y
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
+                        </v-date-picker>
+                      </v-menu> -->
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                      lg="2"
+                      xs="2"
+                      class="mt-7"
+                    >
+                      <v-text-field
+                        v-model="diaSemana"
+                        readonly
+                        label="Dia da Semana"
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                      lg="2"
+                      xs="2"
+                      class="mt-7"
+                    >
+                      <v-text-field
+                        label="ID / RDO"
+                        v-model="dataIDRDO"
+                        readonly
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row class="px-5 py-2">
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                    >
+                      <v-card class="color-card">
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            sm="12"
+                            md="12"
+                            lg="12"
+                            xs="12"
+                            class="pt-5 pb-0"
+                          >
+                          <h4>Informações do Projeto:</h4>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                          >
+                            <v-autocomplete
+                              v-if="tipoRdo !== 'editar'"
+                              v-model="nomeCliente"
+                              :items="clientes"
+                              label="Cliente"
+                              clearable
                               solo
-                              v-model="inicioPrevisto"
-                              class="pt-2"
-                              label="0"
-                              prepend-inner-icon="mdi-clock-time-four-outline"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-time-picker
-                            v-if="menu2"
-                            format="24hr"
-                            v-model="inicioPrevisto"
-                            full-width
-                            @click:minute="$refs.menu.save(inicioPrevisto)"
-                          ></v-time-picker>
-                        </v-menu>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                        <span class="pl-2">Termino Previsto: </span>
-                        <v-menu
-                          ref="menu3"
-                          v-model="menu4"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          :return-value.sync="terminoPrevisto"
-                          transition="scale-transition"
-                          offset-y
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              solo
-                              v-model="terminoPrevisto"
-                              label="0"
-                              class="pt-2"
-                              prepend-inner-icon="mdi-clock-time-four-outline"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-time-picker
-                            v-if="menu4"
-                            format="24hr"
-                            v-model="terminoPrevisto"
-                            full-width
-                            @click:minute="$refs.menu3.save(terminoPrevisto)"
-                          ></v-time-picker>
-                        </v-menu>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                        <span class="pl-2">Início Real: </span>
-                        <v-menu
-                          ref="menu5"
-                          v-model="menu6"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          :return-value.sync="inicioReal"
-                          transition="scale-transition"
-                          offset-y
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              solo
-                              v-model="inicioReal"
-                              label="0"
-                              class="pt-2"
-                              prepend-inner-icon="mdi-clock-time-four-outline"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-time-picker
-                            v-if="menu6"
-                            format="24hr"
-                            v-model="inicioReal"
-                            full-width
-                            @click:minute="$refs.menu5.save(inicioReal)"
-                          ></v-time-picker>
-                        </v-menu>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          sm="4"
-                          md="4"
-                          lg="2"
-                          xs="2"
-                        >
-                        <span class="pl-2">Termino Real: </span>
-                        <v-menu
-                          ref="menu7"
-                          v-model="menu8"
-                          :close-on-content-click="false"
-                          :nudge-right="40"
-                          :return-value.sync="terminoReal"
-                          transition="scale-transition"
-                          offset-y
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              solo
-                              v-model="terminoReal"
-                              label="0"
-                              class="pt-2"
-                              prepend-inner-icon="mdi-clock-time-four-outline"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-time-picker
-                            v-if="menu8"
-                            format="24hr"
-                            v-model="terminoReal"
-                            full-width
-                            @click:minute="$refs.menu7.save(terminoReal)"
-                          ></v-time-picker>
-                        </v-menu>
-                        </v-col>
-                      </v-row>
 
-                      <v-row class="px-5">
-                        <v-col
-                          cols="12"
-                          sm="12"
-                          md="12"
-                          lg="12"
-                          xs="12"
-                          class="text-center"
-                        >
-                        <v-data-table
-                          :headers="headersAtividade"
-                          :items="dessertsAtividade"
-                          sort-by="horaNormalInicio"
-                          class="elevation-1"
-                        >
-                          <template v-slot:top>
-                            <v-toolbar
-                              flat
+                              @change="getFiltroProjeto(nomeCliente)"
+                            ></v-autocomplete>
+                            <v-text-field
+                              v-if="tipoRdo === 'editar'"
+                              v-model="nomeCliente"
+                              label="Cliente"
+                              solo
+                              disabled
                             >
-                              <v-toolbar-title>Mão de obra direta</v-toolbar-title>
-                              <v-divider
-                                class="mx-4"
-                                inset
-                                vertical
-                              ></v-divider>
-                              <v-spacer></v-spacer>
-                              <v-dialog
-                                v-model="dialogAtividade"
-                                max-width="700px"
-                              >
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                    color="primary"
-                                    dark
-                                    class="mb-2"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    @click="changeId()"
-                                  >
-                                    Adicionar Atividade
-                                  </v-btn>
-                                </template>
-                                <v-card>
-                                  <v-card-title>
-                                    <span class="headline">{{ formTitleAtividade }}</span>
-                                  </v-card-title>
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                          >
+                            <v-autocomplete
+                            v-if="tipoRdo !== 'editar'"
+                              v-model="nomeProjetos"
+                              :items="arrayProjetos"
+                              label="Projetos"
+                              clearable
+                              solo
 
-                                  <v-card-text>
-                                    <v-container>
-                                      <v-row>
-                                        <v-col
-                                          cols="12"
-                                          sm="10"
-                                          md="10"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.descricao"
-                                            label="DESCRIÇÃO DO SERVIÇO"
-                                            clearable
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="2"
-                                          md="2"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.id "
-                                            label="Id"
-                                            readonly
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="4"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.quantCont"
-                                            label="QUANT. CONT."
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="4"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.realAcum"
-                                            label="REAL ACUM."
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="4"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.quantReal"
-                                            label="QUANT. REAL"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.saldoCont"
-                                            label="SALDO QUANT."
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.unidade"
-                                            label="Unidade"
-                                          ></v-text-field>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          sm="6"
-                                          md="4"
-                                        >
-                                          <v-text-field
-                                            v-model="editedItemAtividade.referencia"
-                                            label="Referência"
-                                          ></v-text-field>
-                                        </v-col>
-                                      </v-row>
-                                    </v-container>
-                                  </v-card-text>
-
-                                  <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                      color="blue darken-1"
-                                      text
-                                      @click="closeAtividade"
-                                    >
-                                      Cancel
-                                    </v-btn>
-                                    <v-btn
-                                      color="green darken-1"
-                                      text
-                                      @click="saveAtividade"
-                                    >
-                                      Salvar
-                                    </v-btn>
-                                  </v-card-actions>
-                                </v-card>
-                              </v-dialog>
-                              <v-dialog v-model="dialogDeleteAtividade" max-width="500px">
-                                <v-card>
-                                  <v-card-title class="headline">Tem certeza que vai excluir?</v-card-title>
-                                  <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn color="blue darken-1" text @click="closeDeleteAtividade">Cancel</v-btn>
-                                    <v-btn color="blue darken-1" text @click="deleteItemConfirmAtividade">OK</v-btn>
-                                    <v-spacer></v-spacer>
-                                  </v-card-actions>
-                                </v-card>
-                              </v-dialog>
-                            </v-toolbar>
-                          </template>
-                          <template v-slot:[`item.actions`]="{ item }">
-                            <v-icon
-                              small
-                              class="mr-2"
-                              @click="editItemAtividade(item)"
+                              :disabled="nomeCliente ? false : true"
+                            ></v-autocomplete>
+                            <v-text-field
+                              v-if="tipoRdo === 'editar'"
+                              v-model="nomeProjetos"
+                              label="Projetos"
+                              solo
+                              disabled
                             >
-                              mdi-pencil
-                            </v-icon>
-                            <v-icon
-                              small
-                              @click="deleteItemAtividade(item)"
-                            >
-                              mdi-delete
-                            </v-icon>
-                          </template>
-                        </v-data-table>
-                        </v-col>
-                      </v-row>
-                    </v-card>
-                  </v-col>
-                </v-row>
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                          >
+                            <v-text-field
+                              v-model="areaAtuacao"
+                              label="Area de Atuação"
+                              solo
 
-                <v-row class="px-5 py-2">
-                  <v-col
-                    cols="12"
-                    md="12"
-                    lg="12"
-                    sm="12"
-                    xs="12"
-                  >
-                    <v-card class="color-card">
-                      <v-row class="px-5">
-                        <v-col
-                          cols="12"
-                          md="12"
-                          lg="12"
-                          sm="12"
-                          xs="12"
-                          class="text-center"
-                        >
-                        <h4>COMENTÁRIOS  CONTRATADA</h4>
-                        </v-col>
-                        <v-col
-                          cols="12"
-                          md="12"
-                          lg="12"
-                          sm="12"
-                          xs="12"
-                          class="text-center"
-                        >
-                          <v-textarea
+                            >
+                            </v-text-field>
+                          </v-col>
+                        </v-row >
+
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                          >
+                            <v-text-field
+                              v-model="cartaChamada"
+                              label="Carta Chamada"
+                              solo
+
+                            >
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                          >
+                            <v-autocomplete
+                              v-model="nomeFiscal"
+                              :items="arrayFiscal"
+                              label="Fiscal"
+                              clearable
+                              solo
+
+                            ></v-autocomplete>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                          >
+                            <v-autocomplete
+                              v-model="nomeEncarregado"
+                              :items="arrayColaboradores"
+                              label="Encarregado"
+                              clearable
+                              solo
+
+                            ></v-autocomplete>
+                          </v-col>
+                        </v-row>
+                        <v-divider class="mx-5"></v-divider>
+                        <v-row class="px-5 d-flex justify-center pt-5">
+                          <v-col
+                            cols="12"
+                            sm="12"
+                            md="12"
+                            lg="12"
+                            xs="12"
+                            class="pb-0"
+                          >
+                          <h4>Informações do Projeto:</h4>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                            <span>Prazo Da Atividade</span>
+                            <v-text-field
+                              v-model="prazoAtividade"
+                              label="Prazo Da Atividade"
+                              solo
+                              class="pt-2"
+                            >
+                            </v-text-field>
+                          </v-col>
+
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                            <span>Dias Decorridos</span>
+                            <v-text-field
+                              v-model="diasDecorridos"
+                              label="Dias Decorridos"
+                              solo
+                              class="pt-2"
+                            >
+                            </v-text-field>
+                          </v-col>
+
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                            <span>Prorrogação</span>
+                            <v-text-field
+                              v-model="prorrogacao"
+                              label="Prorrogação"
+                              solo
+                              class="pt-2"
+                            >
+                            </v-text-field>
+                          </v-col>
+
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                            <span>Dias Restantes</span>
+                            <v-text-field
+                              v-model="diasRestantes"
+                              label="Dias Restantes"
+                              solo
+                              class="pt-2"
+                            >
+                            </v-text-field>
+                          </v-col>
+
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                            <span>Dias De Atrazo</span>
+                            <v-text-field
+                              v-model="diasDeAtrazos"
+                              label="Dias De Atrazo"
+                              solo
+                              class="pt-2"
+                            >
+                            </v-text-field>
+                          </v-col>
+                        </v-row>
+                        <v-divider class="mx-5"></v-divider>
+                        <v-row class="px-5 d-flex justify-center pt-5">
+                          <v-col
+                            cols="12"
+                            sm="12"
+                            md="12"
+                            lg="12"
+                            xs="12"
+                            class="pb-0"
+                          >
+                          <h4>Condição do Tempo:</h4>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="3"
+                            md="3"
+                            lg="2"
+                            xs="2"
+                            style="text-align:center"
+                          >
+                          <h4>Manhã</h4>
+                          <v-select
+                            v-model="condicaoManha"
+                            label="Condição"
+                            :items="condicao"
+
                             solo
-                            v-model="comentarios"
-                            label="Comentários"
-                            auto-grow
                             clearable
-                            rows="4"
-                          ></v-textarea>
-                        </v-col>
-                      </v-row>
-                    </v-card>
-                  </v-col>
-                </v-row>
+                            class="pt-2"
+                          >
+                          </v-select>
+                          </v-col>
 
-                <v-row class="px-5">
-                  <v-col
-                    cols="12"
-                    md="12"
-                    lg="12"
-                    sm="12"
-                    xs="12"
-                    class="mt-7 text-right"
-                  >
-                  <v-btn @click="salvarRDO()" color="green" class="mr-3 white--text">Salvar</v-btn>
-                  <v-btn @click="returnRDO()" color="primary">Voltar</v-btn>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card>
+                          <v-col
+                            cols="12"
+                            sm="3"
+                            md="3"
+                            lg="2"
+                            xs="2"
+                            style="text-align:center"
+                          >
+                          <h4>Tarde</h4>
+                          <v-select
+                            v-model="condicaoTarde"
+                            label="Condição"
+                            :items="condicao"
+
+                            solo
+                            clearable
+                            class="pt-2"
+                          >
+                          </v-select>
+                          </v-col>
+
+                          <v-col
+                            cols="12"
+                            sm="3"
+                            md="3"
+                            lg="2"
+                            xs="2"
+                            style="text-align:center"
+                          >
+                          <h4>Noite</h4>
+                          <v-select
+                            v-model="condicaoNoite"
+                            label="Condição"
+                            :items="condicao"
+
+                            solo
+                            clearable
+                            class="pt-2"
+                          >
+                          </v-select>
+                          </v-col>
+                        </v-row>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="px-5 py-2">
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                    >
+                      <v-card class="color-card">
+                        <v-row>
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                            <h4>EFETIVOS</h4>
+                          </v-col>
+                        </v-row>
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                          <v-data-table
+                            :headers="headers"
+                            :items="desserts"
+                            sort-by="horaNormalInicio"
+                            class="elevation-1"
+                          >
+                            <template v-slot:top>
+                              <v-toolbar
+                                flat
+                              >
+                                <v-toolbar-title>Mão de obra direta</v-toolbar-title>
+                                <v-divider
+                                  class="mx-4"
+                                  inset
+                                  vertical
+                                ></v-divider>
+                                <v-spacer></v-spacer>
+                                <v-dialog
+                                  v-model="dialog"
+                                  max-width="500px"
+                                >
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                      color="primary"
+                                      dark
+                                      class="mb-2"
+                                      v-bind="attrs"
+                                      v-on="on"
+                                    >
+                                      Adicionar Efetivo
+                                    </v-btn>
+                                  </template>
+                                  <v-card>
+                                    <v-card-title>
+                                      <span class="headline">{{ formTitle }}</span>
+                                    </v-card-title>
+
+                                    <v-card-text>
+                                      <v-container>
+                                        <v-row>
+                                          <v-col
+                                            cols="12"
+                                            sm="12"
+                                            md="12"
+                                          >
+                                            <v-autocomplete
+                                              v-model="editedItem.name"
+                                              :items="arrayColaboradores"
+                                              label="Encarregado"
+                                              @change="ajusteNome()"
+                                              clearable
+                                            ></v-autocomplete>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="12"
+                                            md="12"
+                                          >
+                                          <h4>Hora Normal</h4>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalInicio"
+                                              label="Início"
+                                              @change="horaNormal()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalTermino"
+                                              label="Término"
+                                              @change="horaNormal()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalTotal"
+                                              label="Total"
+                                              disabled
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="12"
+                                            md="12"
+                                          >
+                                            <h4>Hora Extra Seg A Sáb</h4>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalExtraInicio"
+                                              label="Início"
+                                              @change="horaNormalExtra()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalExtraTermino"
+                                              label="Termino"
+                                              @change="horaNormalExtra()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalExtraTotal"
+                                              label="Total"
+                                              disabled
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="12"
+                                            md="12"
+                                          >
+                                            <h4>Hora Normal Noturna</h4>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalNoturnaInicio"
+                                              label="Início"
+                                              @change="horaNormalNoturna()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalNoturnaTermino"
+                                              label="Termino"
+                                              @change="horaNormalNoturna()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaNormalNoturnaTotal"
+                                              label="Total"
+                                              disabled
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="12"
+                                            md="12"
+                                          >
+                                            <h4>Hora Extra Noturna</h4>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaExtraNoturnaInicio"
+                                              label="Início"
+                                              @change="horaExtraNoturna()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaExtraNoturnaTermino"
+                                              label="Termino"
+                                              @change="horaExtraNoturna()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaExtraNoturnaTotal"
+                                              label="Total"
+                                              disabled
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="12"
+                                            md="12"
+                                          >
+                                            <h4>Hora Extra Dom e Feriado</h4>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaExtraFdsInicio"
+                                              label="Início"
+                                              @change="horaExtraFds()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaExtraFdsTermino"
+                                              label="Termino"
+                                              @change="horaExtraFds()"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItem.horaExtraFdsTotal"
+                                              label="Total"
+                                              disabled
+                                            ></v-text-field>
+                                          </v-col>
+                                        </v-row>
+                                      </v-container>
+                                    </v-card-text>
+
+                                    <v-card-actions>
+                                      <v-spacer></v-spacer>
+                                      <v-btn
+                                        color="blue darken-1"
+                                        text
+                                        @click="close"
+                                      >
+                                        Cancel
+                                      </v-btn>
+                                      <v-btn
+                                        color="green darken-1"
+                                        text
+                                        @click="save"
+                                      >
+                                        Salvar
+                                      </v-btn>
+                                    </v-card-actions>
+                                  </v-card>
+                                </v-dialog>
+                                <v-dialog v-model="dialogDelete" max-width="500px">
+                                  <v-card>
+                                    <v-card-title class="headline">Tem certeza que vai excluir?</v-card-title>
+                                    <v-card-actions>
+                                      <v-spacer></v-spacer>
+                                      <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                                      <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                                      <v-spacer></v-spacer>
+                                    </v-card-actions>
+                                  </v-card>
+                                </v-dialog>
+                              </v-toolbar>
+                            </template>
+                            <template v-slot:[`item.actions`]="{ item }">
+                              <v-icon
+                                small
+                                class="mr-2"
+                                @click="editItem(item)"
+                              >
+                                mdi-pencil
+                              </v-icon>
+                              <v-icon
+                                small
+                                @click="deleteItem(item)"
+                              >
+                                mdi-delete
+                              </v-icon>
+                            </template>
+                          </v-data-table>
+                          </v-col>
+                        </v-row>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="px-5 py-2">
+                    <v-col
+                      cols="12"
+                      sm="12"
+                      md="12"
+                      lg="12"
+                      xs="12"
+                    >
+                    <v-card class="color-card px-5">
+                        <v-row>
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                          >
+                            <h4>Observações</h4>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="8"
+                            md="8"
+                            lg="8"
+                            xs="8"
+                            class="py-0"
+                          >
+                            <v-text-field
+                              label="Houve DDS neste dia?"
+                              solo
+                              disabled
+                            >
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                            class="py-0"
+                          >
+                            <v-select
+                            v-model="opcoesDDS"
+                            label="Sim / Não"
+                            :items="opcoes"
+                            solo
+                            clearable
+                          >
+                          </v-select>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="8"
+                            md="8"
+                            lg="8"
+                            xs="8"
+                            class="py-0"
+                          >
+                            <v-text-field
+                              label="Houve algum prejuízo material ou de equipamento neste dia?"
+                              solo
+                              disabled
+                            >
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                            class="py-0"
+                          >
+                            <v-select
+                            v-model="opcoesPrejuizo"
+                            label="Sim / Não"
+                            :items="opcoes"
+                            solo
+                            clearable
+                          >
+                          </v-select>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="8"
+                            md="8"
+                            lg="8"
+                            xs="8"
+                            class="py-0"
+                          >
+                            <v-text-field
+                              label="Houve violações de segurança neste dia?"
+                              solo
+                              disabled
+                            >
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                            class="py-0"
+                          >
+                            <v-select
+                            v-model="opcoesViolacao"
+                            label="Sim / Não"
+                            :items="opcoes"
+                            solo
+                            clearable
+                          >
+                          </v-select>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="8"
+                            md="8"
+                            lg="8"
+                            xs="8"
+                            class="py-0"
+                          >
+                            <v-text-field
+                              label="Houve ociosidade ocorrida por acidentes neste dia?"
+                              solo
+                              disabled
+                            >
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                            class="py-0"
+                          >
+                            <v-select
+                            v-model="opcoesOciosidade"
+                            label="Sim / Não"
+                            :items="opcoes"
+                            solo
+                            clearable
+                          >
+                          </v-select>
+                          </v-col>
+                        </v-row>
+                    </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="px-5 py-2">
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                    >
+                      <v-card class="color-card">
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                            <h4>ATIVIDADES EM EXECUÇÃO</h4>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                          >
+                            <span class="pl-2">Serviço: </span>
+                            <v-text-field
+                              v-model="servico"
+                              label="Serviço"
+                              class="pt-2"
+                              solo
+                            ></v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                          <span class="pl-2">Início Previsto: </span>
+                          <v-menu
+                            ref="menu"
+                            v-model="menu2"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            :return-value.sync="inicioPrevisto"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                solo
+                                v-model="inicioPrevisto"
+                                class="pt-2"
+                                label="0"
+                                prepend-inner-icon="mdi-clock-time-four-outline"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="menu2"
+                              format="24hr"
+                              v-model="inicioPrevisto"
+                              full-width
+                              @click:minute="$refs.menu.save(inicioPrevisto)"
+                            ></v-time-picker>
+                          </v-menu>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                          <span class="pl-2">Termino Previsto: </span>
+                          <v-menu
+                            ref="menu3"
+                            v-model="menu4"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            :return-value.sync="terminoPrevisto"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                solo
+                                v-model="terminoPrevisto"
+                                label="0"
+                                class="pt-2"
+                                prepend-inner-icon="mdi-clock-time-four-outline"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="menu4"
+                              format="24hr"
+                              v-model="terminoPrevisto"
+                              full-width
+                              @click:minute="$refs.menu3.save(terminoPrevisto)"
+                            ></v-time-picker>
+                          </v-menu>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                          <span class="pl-2">Início Real: </span>
+                          <v-menu
+                            ref="menu5"
+                            v-model="menu6"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            :return-value.sync="inicioReal"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                solo
+                                v-model="inicioReal"
+                                label="0"
+                                class="pt-2"
+                                prepend-inner-icon="mdi-clock-time-four-outline"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="menu6"
+                              format="24hr"
+                              v-model="inicioReal"
+                              full-width
+                              @click:minute="$refs.menu5.save(inicioReal)"
+                            ></v-time-picker>
+                          </v-menu>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="2"
+                            xs="2"
+                          >
+                          <span class="pl-2">Termino Real: </span>
+                          <v-menu
+                            ref="menu7"
+                            v-model="menu8"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            :return-value.sync="terminoReal"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="290px"
+                            min-width="290px"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                solo
+                                v-model="terminoReal"
+                                label="0"
+                                class="pt-2"
+                                prepend-inner-icon="mdi-clock-time-four-outline"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-time-picker
+                              v-if="menu8"
+                              format="24hr"
+                              v-model="terminoReal"
+                              full-width
+                              @click:minute="$refs.menu7.save(terminoReal)"
+                            ></v-time-picker>
+                          </v-menu>
+                          </v-col>
+                        </v-row>
+
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            sm="12"
+                            md="12"
+                            lg="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                          <v-data-table
+                            :headers="headersAtividade"
+                            :items="dessertsAtividade"
+                            sort-by="horaNormalInicio"
+                            class="elevation-1"
+                          >
+                            <template v-slot:top>
+                              <v-toolbar
+                                flat
+                              >
+                                <v-toolbar-title>Mão de obra direta</v-toolbar-title>
+                                <v-divider
+                                  class="mx-4"
+                                  inset
+                                  vertical
+                                ></v-divider>
+                                <v-spacer></v-spacer>
+                                <v-dialog
+                                  v-model="dialogAtividade"
+                                  max-width="700px"
+                                >
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                      color="primary"
+                                      dark
+                                      class="mb-2"
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      @click="changeId()"
+                                    >
+                                      Adicionar Atividade
+                                    </v-btn>
+                                  </template>
+                                  <v-card>
+                                    <v-card-title>
+                                      <span class="headline">{{ formTitleAtividade }}</span>
+                                    </v-card-title>
+
+                                    <v-card-text>
+                                      <v-container>
+                                        <v-row>
+                                          <v-col
+                                            cols="12"
+                                            sm="10"
+                                            md="10"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.descricao"
+                                              label="DESCRIÇÃO DO SERVIÇO"
+                                              clearable
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="2"
+                                            md="2"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.id "
+                                              label="Id"
+                                              readonly
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="4"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.quantCont"
+                                              label="QUANT. CONT."
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="4"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.realAcum"
+                                              label="REAL ACUM."
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="4"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.quantReal"
+                                              label="QUANT. REAL"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.saldoCont"
+                                              label="SALDO QUANT."
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.unidade"
+                                              label="Unidade"
+                                            ></v-text-field>
+                                          </v-col>
+                                          <v-col
+                                            cols="12"
+                                            sm="6"
+                                            md="4"
+                                          >
+                                            <v-text-field
+                                              v-model="editedItemAtividade.referencia"
+                                              label="Referência"
+                                            ></v-text-field>
+                                          </v-col>
+                                        </v-row>
+                                      </v-container>
+                                    </v-card-text>
+
+                                    <v-card-actions>
+                                      <v-spacer></v-spacer>
+                                      <v-btn
+                                        color="blue darken-1"
+                                        text
+                                        @click="closeAtividade"
+                                      >
+                                        Cancel
+                                      </v-btn>
+                                      <v-btn
+                                        color="green darken-1"
+                                        text
+                                        @click="saveAtividade"
+                                      >
+                                        Salvar
+                                      </v-btn>
+                                    </v-card-actions>
+                                  </v-card>
+                                </v-dialog>
+                                <v-dialog v-model="dialogDeleteAtividade" max-width="500px">
+                                  <v-card>
+                                    <v-card-title class="headline">Tem certeza que vai excluir?</v-card-title>
+                                    <v-card-actions>
+                                      <v-spacer></v-spacer>
+                                      <v-btn color="blue darken-1" text @click="closeDeleteAtividade">Cancel</v-btn>
+                                      <v-btn color="blue darken-1" text @click="deleteItemConfirmAtividade">OK</v-btn>
+                                      <v-spacer></v-spacer>
+                                    </v-card-actions>
+                                  </v-card>
+                                </v-dialog>
+                              </v-toolbar>
+                            </template>
+                            <template v-slot:[`item.actions`]="{ item }">
+                              <v-icon
+                                small
+                                class="mr-2"
+                                @click="editItemAtividade(item)"
+                              >
+                                mdi-pencil
+                              </v-icon>
+                              <v-icon
+                                small
+                                @click="deleteItemAtividade(item)"
+                              >
+                                mdi-delete
+                              </v-icon>
+                            </template>
+                          </v-data-table>
+                          </v-col>
+                        </v-row>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="px-5 py-2">
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                    >
+                      <v-card class="color-card">
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                          <h4>COMENTÁRIOS  CONTRATADA</h4>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                            <v-textarea
+                              solo
+                              v-model="comentarios"
+                              label="Comentários"
+                              auto-grow
+                              clearable
+                              rows="4"
+                            ></v-textarea>
+                          </v-col>
+                        </v-row>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="px-5">
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                      class="mt-7 text-right"
+                    >
+                    <v-btn @click="salvarRDO()" color="green" class="mr-3 white--text">Salvar</v-btn>
+                    <v-btn @click="returnRDO()" color="primary">Voltar</v-btn>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card>
+            </div>
           </v-flex>
         </v-layout>
       </v-container>
@@ -1632,7 +1634,7 @@ export default {
     async getProjetos () {
       const result = await axios({
         method: 'GET',
-        url: `${this.urlProd}dominio/projetosClientes`
+        url: `${this.urlProd}dominio/projetos-clientes`
       })
       this.projetos = result.data
     },

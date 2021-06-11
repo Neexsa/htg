@@ -60,7 +60,33 @@
         dense
         rounded
       >
-      <v-list-item
+      <v-list-group
+        v-for="item in opcoes"
+        :key="item.title"
+      >
+        <template v-slot:activator>
+          <v-list-item-title
+            link
+          >
+          {{ item.principal.title }}
+          </v-list-item-title>
+        </template>
+          <v-list-item
+            v-for="sub in item.submenus"
+            :key="sub.title"
+            link
+            @click="navegar(sub.title)"
+          >
+            <v-list-item-icon>
+              <v-icon class="material-icons-outlined">{{ sub.icon }}</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-content>
+              <v-list-item-title>{{ sub.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+      </v-list-group>
+        <!-- <v-list-item
             v-for="item in items"
             :key="item.title"
             link
@@ -73,7 +99,7 @@
             <v-list-item-content>
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item-content>
-          </v-list-item>
+          </v-list-item> -->
       </v-list>
     </v-navigation-drawer>
   </div>
@@ -90,11 +116,35 @@ export default {
     return {
       drawer: true,
       group: null,
-      items: [
-        { title: 'Home', icon: 'mdi-home' },
-        // { title: 'Cadastro', icon: 'mdi-account-multiple-plus' },
-        { title: 'Clientes', icon: 'mdi-account-multiple' },
-        { title: 'RDO', icon: 'mdi-file-plus' }
+      opcoes: [
+        {
+          principal: {
+            title: 'Home'
+          },
+          submenus: [
+            { title: 'Home', icon: 'mdi-home' }
+          ]
+        },
+        {
+          principal: {
+            title: 'RH'
+          },
+          submenus: [
+            { title: 'Colaboradores', icon: 'mdi-account-multiple-plus' },
+            { title: 'Clientes', icon: 'mdi-factory' },
+            { title: 'Projetos', icon: 'mdi-folder-plus' },
+            { title: 'Funcao', icon: 'mdi-wrench' }
+          ]
+        },
+        {
+          principal: {
+            title: 'RDO'
+          },
+          submenus: [
+            { title: 'RDO', icon: 'mdi-file-plus' }
+            // { title: 'Dashboard', icon: 'mdi-file-plus' }
+          ]
+        }
       ]
     }
   },

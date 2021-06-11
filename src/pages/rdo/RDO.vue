@@ -319,7 +319,7 @@ export default {
     async getProjetos () {
       const result = await axios({
         method: 'GET',
-        url: `${this.urlProd}dominio/projetosClientes`
+        url: `${this.urlProd}dominio/projetos-clientes`
       })
       this.projetos = result.data
     },

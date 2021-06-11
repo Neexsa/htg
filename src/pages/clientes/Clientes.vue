@@ -97,8 +97,8 @@
                                 :key="item.cliente.nome"
                               >
                                 <td>{{ item.cliente.nome }}</td>
-                                <td class="text-center" style="width: 25%">{{ item.quantidadeProjetos }}</td>
-                                <td class="text-center" style="width: 25%">{{ item.quantidadeProjetos }}</td>
+                                <td class="text-center" style="width: 25%">{{ item.quantidadeProjetosAtivos }}</td>
+                                <td class="text-center" style="width: 25%">{{ item.quantidadeProjetosPausados }}</td>
                                 <td class="text-center" style="width: 10%">
                                   <v-btn
                                     width="30px"
@@ -237,6 +237,8 @@ export default {
   components: { Projetos },
   name: 'Clientes',
   data: () => ({
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     clientes: [],
     desserts: [],
     showClientes: true,
@@ -249,8 +251,6 @@ export default {
     mensagem: '',
     colorSnackbar: '',
     nomePesquisa: '',
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -281,6 +281,7 @@ export default {
     returnClientes () {
       this.showProjetos = false
       this.showClientes = true
+      this.getCliente()
       // Atualizar a tabela
     },
 
