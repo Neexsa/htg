@@ -15,7 +15,39 @@
               >
                 <v-theme-provider dark>
                   <slot name="heading" />
-                  <div class="text-h7 white--text pa-3 v-card--material__title"> Criar Colaborador </div>
+                  <div class="py-3">
+                    <v-row class="px-5 d-flex">
+                      <v-col
+                        cols="1"
+                        sm="1"
+                        md="1"
+                        lg="1"
+                        xs="1"
+                        class="text-left"
+                      >
+                        <v-btn
+                          depressed
+                          color="transparent"
+                          class="text-left"
+                          @click="returnColaborador"
+                        >
+                          <v-icon dark small>
+                            mdi-arrow-left-bold-circle mdi-36px
+                          </v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="11"
+                        sm="11"
+                        md="11"
+                        lg="11"
+                        xs="11"
+                        class="text-center"
+                      >
+                        <span class="text-h7 white--text  v-card--material__title pr-15">Criar Colaboradores</span>
+                      </v-col>
+                    </v-row>
+                  </div>
                 </v-theme-provider>
               </v-sheet>
             </v-card-title>
@@ -277,7 +309,7 @@ export default {
     },
 
     async salvarColaborar () {
-      if (this.nomeColaborador) {
+      if (this.nomeColaborador && this.emailColaborador) {
         const params = {
           reg: this.reg,
           dataCriacao: this.dataCriacao,
@@ -313,10 +345,15 @@ export default {
         console.log(params)
       } else {
         const invalidos = []
-        const nome = this.nomeColaborador ? '' : 'Nome'
-        invalidos.push(nome)
+        if (this.nomeColaborador.length < 1) {
+          invalidos.push('Nome')
+        }
+        if (this.emailColaborador.length < 1) {
+          invalidos.push('Email')
+        }
+        console.log(invalidos)
         this.snackbar = true
-        this.mensagem = 'Preencher os campos: ' + invalidos
+        this.mensagem = 'Preencher o(s) campo(s): ' + invalidos.join(', ')
         this.colorSnackbar = 'red'
       }
     },

@@ -14,8 +14,41 @@
                 rounded
                 >
                   <v-theme-provider dark>
-                    <div class="text-h7 white--text pa-3 v-card--material__title"> Clientes </div>
-                  </v-theme-provider>
+                  <slot name="heading" />
+                  <div class="py-3">
+                    <v-row class="px-5 d-flex">
+                      <v-col
+                        cols="1"
+                        sm="1"
+                        md="1"
+                        lg="1"
+                        xs="1"
+                        class="text-left"
+                      >
+                        <v-btn
+                          depressed
+                          color="transparent"
+                          class="text-left"
+                          @click="returnHome"
+                        >
+                          <v-icon dark small>
+                            mdi-arrow-left-bold-circle mdi-36px
+                          </v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="11"
+                        sm="11"
+                        md="11"
+                        lg="11"
+                        xs="11"
+                        class="text-center"
+                      >
+                        <span class="text-h7 white--text  v-card--material__title pr-15">Clientes</span>
+                      </v-col>
+                    </v-row>
+                  </div>
+                </v-theme-provider>
                 </v-sheet>
               </v-card-title>
               <v-card class="card-clientes">
@@ -156,7 +189,7 @@
         </v-layout>
 
         <v-dialog
-        v-model="dialogCliente"
+          v-model="dialogCliente"
           transition="dialog-top-transition"
           max-width="600"
         >
@@ -259,6 +292,9 @@ export default {
     this.getCliente()
   },
   methods: {
+    returnHome () {
+      this.$router.push({ name: 'Home' })
+    },
     async getCliente () {
       const params = {
         nomePesquisa: this.nomePesquisa ? this.nomePesquisa : ''

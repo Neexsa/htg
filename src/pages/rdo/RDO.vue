@@ -15,7 +15,39 @@
               >
                 <v-theme-provider dark>
                   <slot name="heading" />
-                  <div class="text-h7 white--text pa-3 v-card--material__title"> RDO </div>
+                  <div class="py-3">
+                    <v-row class="px-5 d-flex">
+                      <v-col
+                        cols="1"
+                        sm="1"
+                        md="1"
+                        lg="1"
+                        xs="1"
+                        class="text-left"
+                      >
+                        <v-btn
+                          depressed
+                          color="transparent"
+                          class="text-left"
+                          @click="returnHome"
+                        >
+                          <v-icon dark small>
+                            mdi-arrow-left-bold-circle mdi-36px
+                          </v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="11"
+                        sm="11"
+                        md="11"
+                        lg="11"
+                        xs="11"
+                        class="text-center"
+                      >
+                        <span class="text-h7 white--text  v-card--material__title pr-15">RDO</span>
+                      </v-col>
+                    </v-row>
+                  </div>
                 </v-theme-provider>
               </v-sheet>
             </v-card-title>
@@ -162,7 +194,9 @@
                       </template>
 
                       <template v-slot:[`item.download`]="{ item }">
+                        <span v-if="item.rdo.status === 'Criado' || !item.rdo.status">Finalizar RDO</span>
                         <v-btn
+                          v-else
                           width="30px"
                           height="30px"
                           fab
@@ -239,6 +273,11 @@ export default {
         align: 'center'
       },
       {
+        text: 'Status',
+        value: 'rdo.status',
+        align: 'center'
+      },
+      {
         text: 'Editar',
         value: 'editar',
         align: 'center'
@@ -258,6 +297,10 @@ export default {
   },
 
   methods: {
+
+    returnHome () {
+      this.$router.push({ name: 'Home' })
+    },
 
     async downloadPdf (id) {
       console.log(id)

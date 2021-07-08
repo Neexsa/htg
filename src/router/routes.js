@@ -6,6 +6,10 @@ import { routes as clientes } from '../pages/clientes'
 import { routes as projetos } from '../pages/projetos'
 import { routes as colaboradores } from '../pages/colaboradores'
 import { routes as funcao } from '../pages/funcao'
+import { routes as assinatura } from '../pages/assinatura'
+import { routes as user } from '../pages/user'
+import { routes as newAccess } from '../pages/newAccess'
+import { routes as permissao } from '../pages/permissao'
 
 export default [
   ...auth,
@@ -15,5 +19,9 @@ export default [
   ...clientes,
   ...projetos,
   ...colaboradores,
-  ...funcao
+  ...funcao,
+  ...assinatura,
+  ...user,
+  ...newAccess,
+  ...permissao
 ]

@@ -23,6 +23,7 @@
             v-model="email"
             class="px-3 py-0"
             label="Username"
+            type="email"
             :rules="[rules.required]"
             solo
           ></v-text-field>
@@ -100,8 +101,8 @@ export default {
     loading: false,
     dialog: false,
     show1: false,
-    email: 'gabriel.ferreira9854@gmail.com',
-    password: '12345678',
+    email: '',
+    password: '',
     rules: {
       required: value => !!value || 'Campo Obrigatório!!!',
       min: v => v.length >= 8 || 'Min 8 characters',

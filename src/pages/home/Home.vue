@@ -15,7 +15,20 @@
               >
                 <v-theme-provider dark>
                   <slot name="heading" />
-                  <div class="text-h7 white--text pa-3 v-card--material__title"> HOME </div>
+                  <div class="py-3">
+                    <v-row class="px-5 d-flex">
+                      <v-col
+                        cols="12"
+                        sm="12"
+                        md="12"
+                        lg="12"
+                        xs="12"
+                        class="text-center"
+                      >
+                        <span class="text-h7 white--text  v-card--material__title">HOME</span>
+                      </v-col>
+                    </v-row>
+                  </div>
                 </v-theme-provider>
               </v-sheet>
             </v-card-title>

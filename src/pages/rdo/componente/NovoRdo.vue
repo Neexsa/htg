@@ -15,7 +15,39 @@
               >
                 <v-theme-provider dark>
                   <slot name="heading" />
-                  <div class="text-h7 white--text pa-3 v-card--material__title"> Criar RDO </div>
+                  <div class="py-3">
+                    <v-row class="px-5 d-flex">
+                      <v-col
+                        cols="1"
+                        sm="1"
+                        md="1"
+                        lg="1"
+                        xs="1"
+                        class="text-left"
+                      >
+                        <v-btn
+                          depressed
+                          color="transparent"
+                          class="text-left"
+                          @click="returnRDO"
+                        >
+                          <v-icon dark small>
+                            mdi-arrow-left-bold-circle mdi-36px
+                          </v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="11"
+                        sm="11"
+                        md="11"
+                        lg="11"
+                        xs="11"
+                        class="text-center"
+                      >
+                        <span class="text-h7 white--text  v-card--material__title pr-15">Criar RDO</span>
+                      </v-col>
+                    </v-row>
+                  </div>
                 </v-theme-provider>
               </v-sheet>
             </v-card-title>
@@ -1346,7 +1378,8 @@
                       xs="12"
                       class="mt-7 text-right"
                     >
-                    <v-btn @click="salvarRDO()" color="green" class="mr-3 white--text">Salvar</v-btn>
+                    <v-btn @click="salvarRDO('salvar')" color="green" class="mr-3 white--text">Salvar</v-btn>
+                    <v-btn @click="modalFinalizado = true" class="mr-3 white--text" color="orange darken-4">Finalizar</v-btn>
                     <v-btn @click="returnRDO()" color="primary">Voltar</v-btn>
                     </v-col>
                   </v-row>
@@ -1356,6 +1389,35 @@
           </v-flex>
         </v-layout>
       </v-container>
+
+      <v-dialog
+        v-model="modalFinalizado"
+        transition="dialog-top-transition"
+        max-width="600"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >ENVIAR RDO PARA O FISCAL</v-toolbar>
+            <v-card-text>
+              <div class="text-h4 pa-5">Deseja enviar essa RDO para o fiscal ?</div>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="modalFinalizado = false"
+              >Fechar</v-btn>
+              <v-btn
+                color="green"
+                text
+                @click="salvarRDO('finalizar')"
+              >Enviar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
 
       <v-snackbar
         v-model="snackbar"
@@ -1375,13 +1437,34 @@
         </template>
       </v-snackbar>
 
+      <v-dialog
+        v-model="dialogoRespostaErro"
+        width="500"
+      >
+      <modal-resposta-erro
+        v-if="dialogoRespostaErro"
+      />
+    </v-dialog>
+
+    <v-dialog
+        v-model="dialogoRespostaCorreto"
+        width="500"
+      >
+      <modal-resposta-correto
+        v-if="dialogoRespostaCorreto"
+      />
+    </v-dialog>
+
     </div>
 </template>
 
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import ModalRespostaErro from '../../ComponeteGlobal/ModalRespostaErro.vue'
+import ModalRespostaCorreto from '../../ComponeteGlobal/ModalRespostaCorreto.vue'
 export default {
+  components: { ModalRespostaErro, ModalRespostaCorreto },
   props: ['tipoRdo', 'rdoEdit'],
   mounted () {
     if (this.tipoRdo === 'editar') {
@@ -1412,13 +1495,17 @@ export default {
       this.inicioPrevisto = this.rdoEdit.rdo.inicioPrevisto
       this.terminoPrevisto = this.rdoEdit.rdo.terminoPrevisto
       this.comentarios = this.rdoEdit.rdo.comentarios
+      this.dataCriacao = this.rdoEdit.rdo.dataCriacao
 
       console.log(this.rdoEdit)
     }
   },
   data: vm => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
+    dialogoRespostaErro: false,
+    dialogoRespostaCorreto: false,
+    modalFinalizado: false,
     clientes: [],
     projetos: [],
     projetosCliente: [],
@@ -1675,10 +1762,11 @@ export default {
       this.arrayProjetos = this.projetosCliente.map(x => { return x.projeto.nome })
     },
 
-    async salvarRDO () {
+    async salvarRDO (tipo) {
       if (this.nomeCliente && this.nomeProjetos) {
         console.log(new Date(this.dataRdoInicio).valueOf())
         const params = {
+          tipo: tipo,
           nomeCliente: this.nomeCliente ? this.nomeCliente : '',
           nomeProjetos: this.nomeProjetos ? this.nomeProjetos : '',
           dataRdo: this.dataRdoInicio ? this.dataRdoInicio : null,
@@ -1708,47 +1796,52 @@ export default {
           terminoPrevisto: this.terminoPrevisto,
           comentarios: this.comentarios,
           efetivos: this.desserts,
-          atividades: this.dessertsAtividade
+          atividades: this.dessertsAtividade,
+          dataCriacao: this.dataCriacao ? this.dataCriacao : moment(new Date()).valueOf(),
+          dataFinalizado: moment(new Date()).valueOf()
         }
         if (this.tipoRdo === 'editar') {
           console.log(this.tipoRdo, params)
           try {
-            const result = await axios({
+            await axios({
               method: 'POST',
               url: `${this.urlProd}editar-rdo`,
               data: params
             })
-            this.snackbar = true
-            this.mensagem = result.data.mensagem
-            this.colorSnackbar = 'green'
+            this.dialogoRespostaCorreto = true
             this.returnRDO()
           } catch (err) {
             console.log(err)
-            this.snackbar = true
-            this.mensagem = 'Erro ao salvar!!!'
-            this.colorSnackbar = 'red'
+            this.dialogoRespostaErro = true
           }
         } else {
           try {
-            const result = await axios({
+            await axios({
               method: 'POST',
               url: `${this.urlProd}novo-rdo`,
               data: params
             })
-            this.snackbar = true
-            this.mensagem = result.data.mensagem
-            this.colorSnackbar = 'green'
+            this.dialogoRespostaCorreto = true
             this.returnRDO()
           } catch (err) {
             console.log(err)
-            this.snackbar = true
-            this.mensagem = 'Erro ao salvar!!!'
-            this.colorSnackbar = 'red'
+            this.dialogoRespostaErro = true
           }
         }
       } else {
+        const campos = []
+
+        if (this.nomeCliente.length < 1) {
+          campos.push('Clientes')
+        }
+
+        if (this.nomeProjetos.length < 1) {
+          campos.push('Projetos')
+        }
+        console.log(campos)
+
         this.snackbar = true
-        this.mensagem = 'Preencha os Campo Obrigatórios!!!'
+        this.mensagem = `Preencha o(s) Campo(s) ${campos.join(', ')}`
         this.colorSnackbar = 'red'
       }
     },

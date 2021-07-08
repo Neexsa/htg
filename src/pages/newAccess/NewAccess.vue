@@ -1,6 +1,6 @@
 <template>
   <div class="colaboradores">
-      <v-container v-if="showColaboradores">
+      <v-container>
         <v-layout row wrap>
           <v-flex sm12 xs12 md12 lg12 class="mt-10">
               <v-card-title class="align-start">
@@ -14,40 +14,40 @@
                 rounded
                 >
                   <v-theme-provider dark>
-                  <slot name="heading" />
-                  <div class="py-3">
-                    <v-row class="px-5 d-flex">
-                      <v-col
-                        cols="1"
-                        sm="1"
-                        md="1"
-                        lg="1"
-                        xs="1"
-                        class="text-left"
-                      >
-                        <v-btn
-                          depressed
-                          color="transparent"
+                    <slot name="heading" />
+                    <div class="py-3">
+                      <v-row class="px-5 d-flex">
+                        <v-col
+                          cols="1"
+                          sm="1"
+                          md="1"
+                          lg="1"
+                          xs="1"
                           class="text-left"
-                          @click="returnHome"
                         >
-                          <v-icon dark small>
-                            mdi-arrow-left-bold-circle mdi-36px
-                          </v-icon>
-                        </v-btn>
-                      </v-col>
-                      <v-col
-                        cols="11"
-                        sm="11"
-                        md="11"
-                        lg="11"
-                        xs="11"
-                        class="text-center"
-                      >
-                        <span class="text-h7 white--text  v-card--material__title pr-15">Colaboradores</span>
-                      </v-col>
-                    </v-row>
-                  </div>
+                          <v-btn
+                            depressed
+                            color="transparent"
+                            class="text-left"
+                            @click="returnHome"
+                          >
+                            <v-icon dark small>
+                              mdi-arrow-left-bold-circle mdi-36px
+                            </v-icon>
+                          </v-btn>
+                        </v-col>
+                        <v-col
+                          cols="11"
+                          sm="11"
+                          md="11"
+                          lg="11"
+                          xs="11"
+                          class="text-center"
+                        >
+                          <span class="text-h7 white--text  v-card--material__title pr-15"> Novo Acesso </span>
+                        </v-col>
+                      </v-row>
+                    </div>
                 </v-theme-provider>
                 </v-sheet>
               </v-card-title>
@@ -57,10 +57,10 @@
                     <template>
                       <v-col
                         cols="12"
-                        sm="4"
-                        md="4"
-                        lg="4"
-                        xs="4"
+                        sm="5"
+                        md="5"
+                        lg="5"
+                        xs="5"
                       >
                         <v-text-field
                         v-model="nomePesquisa"
@@ -84,23 +84,13 @@
                       </v-col>
                       <v-col
                         cols="12"
-                        sm="4"
-                        md="4"
-                        lg="2"
-                        xs="2"
-                        style="text-align:right"
+                        sm="5"
+                        md="5"
+                        lg="5"
+                        xs="5"
+                        style="text-align:center"
                       >
                         <v-btn color="blue-grey" class="white--text" @click="getColaboradores()">Pesquisar</v-btn>
-                      </v-col>
-                      <v-col
-                        cols="12"
-                        sm="4"
-                        md="4"
-                        lg="4"
-                        xs="4"
-                        style="text-align:right"
-                      >
-                        <v-btn color="blue" class="white--text" @click="newColaborador()">Adicionar Colaborador</v-btn>
                       </v-col>
                     </template>
                   </v-row>
@@ -120,7 +110,7 @@
                             :items-per-page="5"
                             class="elevation-1 color-table"
                           >
-                          <template v-slot:[`item.editar`]="{ item }">
+                          <template v-slot:[`item.criarAcesso`]="{ item }">
                             <v-btn
                               width="30px"
                               height="30px"
@@ -128,26 +118,11 @@
                               dark
                               small
                               color="primary"
-                              @click="editarColaborador(item)"
+                              @click="abrirModal(item)"
                             >
                             <v-icon dark small>
-                              mdi-pencil
-                            </v-icon>{{ item.editar }}
-                            </v-btn>
-                          </template>
-                          <template v-slot:[`item.desativar`]="{ item }">
-                            <v-btn
-                              width="30px"
-                              height="30px"
-                              fab
-                              dark
-                              small
-                              :color="item.status === 'ativo' ? 'red' : 'green'"
-                              @click="alterarStatusColaborador(item)"
-                            >
-                            <v-icon dark small>
-                              {{item.status === 'ativo' ? 'mdi-close' : 'mdi-play'}}
-                            </v-icon>{{ item.editar }}
+                              mdi-account-plus
+                            </v-icon>{{ item.criarAcesso }}
                             </v-btn>
                           </template>
                           </v-data-table>
@@ -159,6 +134,53 @@
               </v-card>
           </v-flex>
         </v-layout>
+
+        <v-dialog
+        v-model="dialogNewAccess"
+          transition="dialog-top-transition"
+          max-width="800"
+        >
+          <template>
+            <v-card>
+              <v-toolbar
+                color="primary"
+                dark
+              >Novo Acesso</v-toolbar>
+              <v-card-text>
+                <div class="text-h4 px-12 py-5">Deseja criar um novo acesso para o(a) {{colaborador.nome ? (colaborador.nome).toUpperCase() : ''}} ?</div>
+              </v-card-text>
+              <v-card-actions class="justify-end">
+                <v-btn
+                  text
+                  @click="dialogNewAccess = false"
+                >Fechar</v-btn>
+                <v-btn
+                  color="green"
+                  text
+                  @click="criarAcesso()"
+                >Criar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
+
+        <v-dialog
+          v-model="dialogoRespostaErro"
+          width="500"
+        >
+        <modal-resposta-erro
+          v-if="dialogoRespostaErro"
+        />
+      </v-dialog>
+
+      <v-dialog
+          v-model="dialogoRespostaCorreto"
+          width="500"
+        >
+        <modal-resposta-correto
+          v-if="dialogoRespostaCorreto"
+        />
+      </v-dialog>
 
         <v-snackbar
           v-model="snackbar"
@@ -178,37 +200,28 @@
           </template>
         </v-snackbar>
       </v-container>
-      <criar-colaborador
-        v-if="showCriarColaborador"
-        v-on:voltar="voltarColaborador()"
-        :tipoColaborador="tipoColaborador"
-        :colaboradorEdit="colaboradorEdit"
-      />
     </div>
 </template>
 
 <script>
 import axios from 'axios'
-import CriarColaborador from './componentes/CriarColaborador.vue'
+import ModalRespostaErro from '../ComponeteGlobal/ModalRespostaErro.vue'
+import ModalRespostaCorreto from '../ComponeteGlobal/ModalRespostaCorreto.vue'
 export default {
-  components: { CriarColaborador },
-  name: 'Colaboradores',
+  components: { ModalRespostaErro, ModalRespostaCorreto },
+  name: 'NewUser',
   data: () => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
-    tipoColaborador: '',
-    colaboradorEdit: [],
-    showCriarColaborador: false,
-    clientes: [],
-    showColaboradores: true,
-    showProjetos: false,
-    nomeCliente: '',
-    novoNomeCliente: '',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
+    dialogoRespostaErro: false,
+    dialogoRespostaCorreto: false,
+    dialogNewAccess: false,
     snackbar: false,
     mensagem: '',
     colorSnackbar: '',
     nomePesquisa: '',
     switchColaborador: true,
+    colaborador: [],
     headers: [
       {
         text: 'Reg',
@@ -237,13 +250,8 @@ export default {
         align: 'center'
       },
       {
-        text: 'Editar',
-        value: 'editar',
-        align: 'center'
-      },
-      {
-        text: 'Desativar / Ativar',
-        value: 'desativar',
+        text: 'Criar Acesso',
+        value: 'criarAcesso',
         align: 'center'
       }
     ],
@@ -263,55 +271,39 @@ export default {
       }
       const result = await axios({
         method: 'POST',
-        url: `${this.urlProd}colaboradores`,
+        url: `${this.urlProd}user-colaboradores`,
         data: params
       })
       this.desserts = result.data
       console.log(this.desserts)
     },
-    voltarColaborador () {
-      this.showColaboradores = true
-      this.showCriarColaborador = false
-      this.getColaboradores()
-    },
-    newColaborador () {
-      this.showColaboradores = false
-      this.showCriarColaborador = true
-    },
-    editarColaborador (item) {
-      this.colaboradorEdit = item
-      this.tipoColaborador = 'editar'
-      this.showColaboradores = false
-      this.showCriarColaborador = true
+
+    abrirModal (item) {
+      this.colaborador = []
+      this.colaborador = item
+      this.dialogNewAccess = true
     },
 
-    async alterarStatusColaborador (item) {
-      console.log(item)
+    async criarAcesso () {
+      console.log(this.colaborador)
       const params = {
-        reg: item.reg,
-        dataCriacao: item.dataCriacao,
-        nomeColaborador: item.nome,
-        emailColaborador: item.email ? item.email : '',
-        telefoneColaborador: item.telefone ? item.telefone : 0,
-        cpfColaborador: item.cpf ? item.cpf : 0,
-        funcaoColaborador: item.funcao ? item.funcao : '',
-        status: this.switchColaborador ? 'inativo' : 'ativo'
+        cpf: this.colaborador.cpf.toString(),
+        email: this.colaborador.email,
+        nome: this.colaborador.nome
       }
+      console.log(params)
       try {
-        const resultColaborador = await axios({
+        await axios({
           method: 'POST',
-          url: `${this.urlProd}alterar-status-colaborador`,
+          url: `${this.urlProd}criar-acesso`,
           data: params
         })
-        this.snackbar = true
-        this.mensagem = resultColaborador.data.mensagem
-        this.colorSnackbar = 'green'
+        this.dialogNewAccess = false
+        this.dialogoRespostaCorreto = true
         this.getColaboradores()
       } catch (err) {
         console.log(err)
-        this.snackbar = true
-        this.mensagem = 'Erro ao salvar!!!'
-        this.colorSnackbar = 'red'
+        this.dialogoRespostaErro = true
       }
     }
   }

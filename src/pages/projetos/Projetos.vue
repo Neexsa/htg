@@ -14,8 +14,41 @@
                 rounded
                 >
                   <v-theme-provider dark>
-                    <div class="text-h7 white--text pa-3 v-card--material__title">Projetos</div>
-                  </v-theme-provider>
+                  <slot name="heading" />
+                  <div class="py-3">
+                    <v-row class="px-5 d-flex">
+                      <v-col
+                        cols="1"
+                        sm="1"
+                        md="1"
+                        lg="1"
+                        xs="1"
+                        class="text-left"
+                      >
+                        <v-btn
+                          depressed
+                          color="transparent"
+                          class="text-left"
+                          @click="returnHome"
+                        >
+                          <v-icon dark small>
+                            mdi-arrow-left-bold-circle mdi-36px
+                          </v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="11"
+                        sm="11"
+                        md="11"
+                        lg="11"
+                        xs="11"
+                        class="text-center"
+                      >
+                        <span class="text-h7 white--text  v-card--material__title pr-15">Projetos</span>
+                      </v-col>
+                    </v-row>
+                  </div>
+                </v-theme-provider>
                 </v-sheet>
               </v-card-title>
               <v-card class="card-projetos">
@@ -111,65 +144,59 @@
                       </v-col>
                       </template>
                     </v-row>
+
                     <v-row>
-                    <template>
                       <v-col
                         cols="12"
+                        sm="12"
                         md="12"
                         lg="12"
-                        sm="12"
                         xs="12"
+                        style="text-align:right"
+                        class="py-0"
                       >
-                        <v-simple-table class="color-table">
-                          <template v-slot:default>
-                            <thead>
-                              <tr>
-                                <th class="text-left">
-                                  Nome dos Projetos
-                                </th>
-                                <th class="text-left">
-                                  Cliente
-                                </th>
-                                <th class="text-left">
-                                  Data Inicio
-                                </th>
-                                <th class="text-left">
-                                  Status
-                                </th>
-                                <th class="text-center">
-                                  Pausar / Ativar
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr
-                                v-for="item in desserts"
-                                :key="item.nome"
-
-                              >
-                                <td>{{ item.nome }}</td>
-                                <td>{{ item.cliente }}</td>
-                                <td>{{ item.dataIncioConfig }}</td>
-                                <td>{{ item.ativo == true ? 'Ativo' : 'Desativo' }}</td>
-                                <td class="click-projetos text-center">
-                                  <v-btn
-                                    width="30px"
-                                    height="30px"
-                                    fab
-                                    dark
-                                    small
-                                    :color="item.pausado ? 'green' : 'red' "
-                                    @click="alterarStatusProjeto(item.nome, item.pausado, item.cliente)"
-                                  >
-                                    <v-icon dark small v-if="item.pausado">mdi-play</v-icon>
-                                    <v-icon dark small v-else>mdi-pause</v-icon>
-                                  </v-btn>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </template>
-                        </v-simple-table>
+                        <v-switch
+                          class="pl-3"
+                          style="text-align:right"
+                          v-model="switchProjetos"
+                          :label="`Buscar Status ${switchProjetos ? 'Ativo' : 'Pausado'}`"
+                          @click="mudarStatus()"
+                        >
+                        </v-switch>
                       </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <template>
+                        <v-col
+                          cols="12"
+                          md="12"
+                          lg="12"
+                          sm="12"
+                          xs="12"
+                        >
+                          <v-data-table
+                            :headers="headers"
+                            :items="desserts"
+                            :items-per-page="5"
+                            class="elevation-1 color-table"
+                          >
+                          <template v-slot:[`item.pausado`]="{ item }">
+                            <v-btn
+                              width="30px"
+                              height="30px"
+                              fab
+                              dark
+                              small
+                              :color="item.pausado ? 'green' : 'red' "
+                              @click="alterarStatusProjeto(item.nome, item.pausado, item.cliente)"
+                            >
+                              <v-icon dark small v-if="item.pausado">mdi-play</v-icon>
+                              <v-icon dark small v-else>mdi-pause</v-icon>
+                            </v-btn>
+                          </template>
+                        </v-data-table>
+                        </v-col>
                       </template>
                     </v-row>
                 </v-container>
@@ -304,9 +331,39 @@ export default {
     dateFormatted: '',
     menu: false,
     menuModal: false,
+    switchProjetos: false,
+    resultArray: [],
     projetos: [],
     desserts: [],
     clientes: [],
+    headers: [
+      {
+        text: 'Nome dos Projetos',
+        align: 'start',
+        sortable: false,
+        value: 'nome'
+      },
+      {
+        text: 'Cliente',
+        value: 'cliente',
+        align: 'start'
+      },
+      {
+        text: 'Data Início',
+        value: 'dataIncioConfig',
+        align: 'center'
+      },
+      {
+        text: 'Status',
+        value: 'status',
+        align: 'center'
+      },
+      {
+        text: 'Pausar / Ativar',
+        value: 'pausado',
+        align: 'center'
+      }
+    ],
     dataInicio: '',
     showRdoProjeto: false,
     dialogCliente: false,
@@ -316,6 +373,7 @@ export default {
     snackbar: false,
     textoPesquisar: '',
     nomeClienteAdicionar: '',
+    nomeCliente: '',
     urlProd: 'https://htgneexsa.cf/api_htg/',
     // urlProd: 'http://localhost:4040/api_htg/',
     rules: {
@@ -339,6 +397,9 @@ export default {
     }
   },
   methods: {
+    returnHome () {
+      this.$router.push({ name: 'Home' })
+    },
     formatDate (date) {
       if (!date) return null
 
@@ -370,13 +431,15 @@ export default {
           url: `${this.urlProd}projetos`,
           data: params
         })
-        this.desserts = result.data.map(item => {
+        this.resultArray = result.data.map(item => {
           return {
             ...item,
-            dataIncioConfig: moment(item.dataInicioInter).format('DD/MM/YYYY')
+            dataIncioConfig: moment(item.dataInicioInter).format('DD/MM/YYYY'),
+            status: item.ativo ? 'Ativo' : 'Desativo'
           }
         })
-        console.log(this.desserts)
+        const arrayNovo = this.resultArray.filter(x => x.pausado === this.switchProjetos)
+        this.desserts = arrayNovo
       } catch (err) {
         console.log(err)
         this.snackbar = true
@@ -442,6 +505,11 @@ export default {
         this.mensagem = 'Não foi possivel alterar o statis do projeto'
         this.colorSnackbar = 'red'
       }
+    },
+
+    mudarStatus () {
+      const switarray = this.resultArray
+      this.desserts = switarray.filter(item => { return item.pausado === this.switchProjetos })
     }
   }
 }
