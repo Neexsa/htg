@@ -1501,8 +1501,8 @@ export default {
     }
   },
   data: vm => ({
-    // urlProd: 'https://htgneexsa.cf/api_htg/',
-    urlProd: 'http://localhost:4040/api_htg/',
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     dialogoRespostaErro: false,
     dialogoRespostaCorreto: false,
     modalFinalizado: false,
