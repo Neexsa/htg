@@ -531,6 +531,7 @@ export default {
           url: `${this.urlProd}finalizar-rdo`,
           data: params
         })
+        this.getRDO()
         this.dialogAssinatura = false
         this.dialogoRespostaCorreto = true
       } catch (err) {
