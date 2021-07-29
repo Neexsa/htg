@@ -10,6 +10,7 @@ import { routes as assinatura } from '../pages/assinatura'
 import { routes as user } from '../pages/user'
 import { routes as newAccess } from '../pages/newAccess'
 import { routes as permissao } from '../pages/permissao'
+import { routes as assinaturaEletronica } from '../pages/assinaturaEletronica'
 
 export default [
   ...auth,
@@ -23,5 +24,6 @@ export default [
   ...assinatura,
   ...user,
   ...newAccess,
-  ...permissao
+  ...permissao,
+  ...assinaturaEletronica
 ]

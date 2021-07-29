@@ -185,7 +185,7 @@
                           dark
                           small
                           color="primary"
-                          @click="rdoNova(item)"
+                          @click="editarRdo(item)"
                         >
                         <v-icon dark small>
                           mdi-pencil
@@ -194,7 +194,7 @@
                       </template>
 
                       <template v-slot:[`item.download`]="{ item }">
-                        <span v-if="item.rdo.status === 'Criado' || !item.rdo.status">Finalizar RDO</span>
+                        <span v-if="item.rdo.status !== 'Assinado'">{{statusRDO(item.rdo.status)}}</span>
                         <v-btn
                           v-else
                           width="30px"
@@ -210,6 +210,35 @@
                         </v-icon>{{ item.download }}
                         </v-btn>
                       </template>
+
+                      <template v-slot:[`item.copiar`]="{ item }">
+                        <v-btn
+                          width="30px"
+                          height="30px"
+                          fab
+                          dark
+                          small
+                          color="red"
+                          @click="copiarRDO(item)"
+                        >
+                        <v-icon dark small>
+                          mdi-cached
+                        </v-icon>{{ item.copiar }}
+                        </v-btn>
+                      </template>
+
+                      <template v-slot:[`item.qtdColaboradores`]="{ item }">
+                        <v-btn
+                          width="30px"
+                          height="30px"
+                          fab
+                          dark
+                          small
+                          color="green"
+                          @click="showColaboradores(item.efetivos)"
+                        >{{ item.qtdColaboradores }}
+                        </v-btn>
+                      </template>
                       </v-data-table>
                     </template>
                   </v-col>
@@ -219,11 +248,48 @@
           </v-flex>
         </v-layout>
       </v-container>
+
+      <v-dialog
+        v-model="modalColaboradores"
+        transition="dialog-top-transition"
+        max-width="400"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+              class="mb-6"
+            >CARGO COLABORADORES</v-toolbar>
+            <v-card-text
+              v-for="item in arrayEfetivo"
+              :key="item.cargo"
+              class="px-3 py-0"
+            >
+            <v-text-field
+              class="text-h6"
+              :label="item.cargo + ': ' + item.qtd"
+              solo
+              readonly
+            >
+            </v-text-field>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="modalColaboradores = false"
+              >Fechar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+
       <novo-rdo
         v-if="showNovoRdo"
         v-on:voltar="voltarRDO()"
         :tipoRdo="tipoRdo"
         :rdoEdit="rdoEdit"
+        :rdoCopi="rdoCopi"
       />
     </div>
 </template>
@@ -235,6 +301,7 @@ import NovoRdo from './componente/NovoRdo.vue'
 export default {
   components: { NovoRdo },
   data: () => ({
+    modalColaboradores: false,
     tipoRdo: '',
     showRdo: true,
     showNovoRdo: false,
@@ -248,6 +315,9 @@ export default {
     date: '',
     menu: false,
     rdoEdit: [],
+    rdoCopi: [],
+    rdoAssinatura: [],
+    arrayEfetivo: [],
     urlProd: 'https://htgneexsa.cf/api_htg/',
     // urlProd: 'http://localhost:4040/api_htg/',
     headers: [
@@ -273,6 +343,16 @@ export default {
         align: 'center'
       },
       {
+        text: 'Sequência',
+        value: 'rdo.sequencia',
+        align: 'center'
+      },
+      {
+        text: 'QTD Colaborador',
+        value: 'qtdColaboradores',
+        align: 'center'
+      },
+      {
         text: 'Status',
         value: 'rdo.status',
         align: 'center'
@@ -285,6 +365,11 @@ export default {
       {
         text: 'Download  RDO',
         value: 'download',
+        align: 'center'
+      },
+      {
+        text: 'Copiar  RDO',
+        value: 'copiar',
         align: 'center'
       }
     ],
@@ -300,6 +385,16 @@ export default {
 
     returnHome () {
       this.$router.push({ name: 'Home' })
+    },
+
+    statusRDO (status) {
+      if (status === 'Criado') {
+        return 'Finalizar RDO'
+      } else if (status === 'Enviado') {
+        return 'Assinar RDO'
+      } else {
+        return ''
+      }
     },
 
     async downloadPdf (id) {
@@ -334,7 +429,8 @@ export default {
       this.desserts = result.data.map(item => {
         return {
           ...item,
-          dataIncioConfig: moment(item.rdo.dataInicio).format('DD/MM/YYYY')
+          dataIncioConfig: moment(item.rdo.dataInicio).format('DD/MM/YYYY'),
+          qtdColaboradores: item.efetivos.length
         }
       })
       console.log(this.desserts)
@@ -349,6 +445,11 @@ export default {
       this.showRdo = true
       this.showNovoRdo = false
       this.getRDO()
+
+      this.rdoEdit = []
+      this.rdoCopi = []
+      this.rdoAssinatura = []
+      this.tipoRdo = ''
       // this.$router.push({ name: 'RDO' })
     },
     async getClientes () {
@@ -373,11 +474,35 @@ export default {
       this.arrayProjetos = this.projetosCliente.map(x => { return x.projeto.nome })
     },
 
-    rdoNova (item) {
+    editarRdo (item) {
       this.rdoEdit = item
       this.showNovoRdo = true
       this.showRdo = false
       this.tipoRdo = 'editar'
+    },
+
+    copiarRDO (item) {
+      console.log(item)
+      this.rdoCopi = item
+      this.showNovoRdo = true
+      this.showRdo = false
+      this.tipoRdo = 'copiar'
+    },
+
+    showColaboradores (item) {
+      this.modalColaboradores = true
+      this.arrayEfetivo = []
+      const cargos = item.map(x => { return x.funcaoEfetivo })
+      cargos.forEach(element => {
+        let filterItem = []
+        filterItem = item.filter(y => { return y.funcaoEfetivo === element })
+        const cargosEfet = {
+          cargo: element,
+          qtd: filterItem.length
+        }
+        this.arrayEfetivo.push(cargosEfet)
+      })
+      console.log(this.arrayEfetivo)
     }
   }
 }

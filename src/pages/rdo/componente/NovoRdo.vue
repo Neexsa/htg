@@ -69,38 +69,6 @@
                           label="Data Inicio"
                         >
                       </v-text-field>
-                      <!-- <v-menu
-                        ref="menu"
-                        v-model="menu"
-                        :close-on-content-click="false"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="auto"
-                        readonly
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="dateFormatted"
-                            label="Data Inicio"
-                            prepend-icon="mdi-calendar"
-
-                            readonly
-                            v-bind="attrs"
-                            @blur="date = parseDate(dateFormatted)"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="date"
-                          :first-day-of-week="0"
-                          locale="pt-bt"
-                          no-title
-                          scrollable
-                          @input="menu = false"
-                          readonly
-                        >
-                        </v-date-picker>
-                      </v-menu> -->
                     </v-col>
                     <v-col
                       cols="12"
@@ -132,7 +100,23 @@
                       >
                       </v-text-field>
                     </v-col>
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                      lg="2"
+                      xs="2"
+                      class="mt-7"
+                    >
+                      <v-text-field
+                        label="Seguencia RDO"
+                        v-model="seguencia"
+                        readonly
+                      >
+                      </v-text-field>
+                    </v-col>
                   </v-row>
+
                   <v-row class="px-5 py-2">
                     <v-col
                       cols="12"
@@ -161,7 +145,7 @@
                             xs="4"
                           >
                             <v-autocomplete
-                              v-if="tipoRdo !== 'editar'"
+                              v-if="tipoRdo !== 'editar' && tipoRdo !== 'assinatura'"
                               v-model="nomeCliente"
                               :items="clientes"
                               label="Cliente"
@@ -171,7 +155,7 @@
                               @change="getFiltroProjeto(nomeCliente)"
                             ></v-autocomplete>
                             <v-text-field
-                              v-if="tipoRdo === 'editar'"
+                              v-if="tipoRdo === 'editar' || tipoRdo === 'assinatura'"
                               v-model="nomeCliente"
                               label="Cliente"
                               solo
@@ -187,7 +171,7 @@
                             xs="4"
                           >
                             <v-autocomplete
-                            v-if="tipoRdo !== 'editar'"
+                              v-if="tipoRdo !== 'editar' && tipoRdo !== 'assinatura'"
                               v-model="nomeProjetos"
                               :items="arrayProjetos"
                               label="Projetos"
@@ -195,9 +179,10 @@
                               solo
 
                               :disabled="nomeCliente ? false : true"
+                              @change="buscarSeguencial()"
                             ></v-autocomplete>
                             <v-text-field
-                              v-if="tipoRdo === 'editar'"
+                              v-if="tipoRdo === 'editar' || tipoRdo === 'assinatura'"
                               v-model="nomeProjetos"
                               label="Projetos"
                               solo
@@ -216,7 +201,7 @@
                               v-model="areaAtuacao"
                               label="Area de Atuação"
                               solo
-
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             >
                             </v-text-field>
                           </v-col>
@@ -234,7 +219,7 @@
                               v-model="cartaChamada"
                               label="Carta Chamada"
                               solo
-
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             >
                             </v-text-field>
                           </v-col>
@@ -251,7 +236,7 @@
                               label="Fiscal"
                               clearable
                               solo
-
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             ></v-autocomplete>
                           </v-col>
                           <v-col
@@ -267,7 +252,7 @@
                               label="Encarregado"
                               clearable
                               solo
-
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             ></v-autocomplete>
                           </v-col>
                         </v-row>
@@ -296,6 +281,7 @@
                               label="Prazo Da Atividade"
                               solo
                               class="pt-2"
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             >
                             </v-text-field>
                           </v-col>
@@ -313,6 +299,7 @@
                               label="Dias Decorridos"
                               solo
                               class="pt-2"
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             >
                             </v-text-field>
                           </v-col>
@@ -330,6 +317,7 @@
                               label="Prorrogação"
                               solo
                               class="pt-2"
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             >
                             </v-text-field>
                           </v-col>
@@ -347,6 +335,7 @@
                               label="Dias Restantes"
                               solo
                               class="pt-2"
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             >
                             </v-text-field>
                           </v-col>
@@ -364,6 +353,7 @@
                               label="Dias De Atrazo"
                               solo
                               class="pt-2"
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             >
                             </v-text-field>
                           </v-col>
@@ -393,7 +383,7 @@
                             v-model="condicaoManha"
                             label="Condição"
                             :items="condicao"
-
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                             solo
                             clearable
                             class="pt-2"
@@ -414,7 +404,7 @@
                             v-model="condicaoTarde"
                             label="Condição"
                             :items="condicao"
-
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                             solo
                             clearable
                             class="pt-2"
@@ -435,7 +425,7 @@
                             v-model="condicaoNoite"
                             label="Condição"
                             :items="condicao"
-
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                             solo
                             clearable
                             class="pt-2"
@@ -447,7 +437,7 @@
                     </v-col>
                   </v-row>
 
-                  <v-row class="px-5 py-2">
+                  <v-row class="px-5 py-2" >
                     <v-col
                       cols="12"
                       md="12"
@@ -468,6 +458,43 @@
                             <h4>EFETIVOS</h4>
                           </v-col>
                         </v-row>
+                        <v-row class="px-5" v-if="tipoRdo !== 'assinatura'">
+                          <v-col
+                            cols="10"
+                            md="10"
+                            lg="10"
+                            sm="10"
+                            xs="10"
+                            class="text-center"
+                          >
+                            <v-autocomplete
+                              v-model="efetivosArray"
+                              :items="arrayColaboradores"
+                              label="Adicionar Encarregado"
+                              hint="Adicionar os Encarregados"
+                              persistent-hint
+                              clearable
+                              solo
+                            ></v-autocomplete>
+                          </v-col>
+                          <v-col
+                            cols="2"
+                            md="2"
+                            lg="2"
+                            sm="2"
+                            xs="2"
+                            class="text-right"
+                          >
+                          <v-btn
+                            color="primary"
+                            dark
+                            class="mt-1"
+                            @click="adiconarColaboradores()"
+                          >
+                            ADICIONAR
+                          </v-btn>
+                          </v-col>
+                        </v-row>
                         <v-row class="px-5">
                           <v-col
                             cols="12"
@@ -477,311 +504,103 @@
                             xs="12"
                             class="text-center"
                           >
-                          <v-data-table
-                            :headers="headers"
-                            :items="desserts"
-                            sort-by="horaNormalInicio"
-                            class="elevation-1"
-                          >
-                            <template v-slot:top>
-                              <v-toolbar
-                                flat
-                              >
-                                <v-toolbar-title>Mão de obra direta</v-toolbar-title>
-                                <v-divider
-                                  class="mx-4"
-                                  inset
-                                  vertical
-                                ></v-divider>
-                                <v-spacer></v-spacer>
-                                <v-dialog
-                                  v-model="dialog"
-                                  max-width="500px"
+                          <v-simple-table>
+                            <template v-slot:default>
+                              <thead>
+                                <tr>
+                                  <th class="text-left">
+                                    ID
+                                  </th>
+                                  <th class="text-left">
+                                    Nome
+                                  </th>
+                                  <th class="text-left">
+                                    Cargo
+                                  </th>
+                                  <th class="text-center">
+                                    Horario Normal
+                                  </th>
+                                  <th class="text-center">
+                                    Hora Extra Sag/Sáb
+                                  </th>
+                                  <th class="text-center">
+                                    Horario Normal Noturna
+                                  </th>
+                                  <th class="text-center">
+                                    Horario Extra Noturna
+                                  </th>
+                                  <th class="text-center">
+                                    Horario Extra Dom/Feri
+                                  </th>
+                                  <th class="text-center" v-if="tipoRdo !== 'assinatura'">
+                                    Adicionar Horas
+                                  </th>
+                                  <th class="text-center" v-if="tipoRdo !== 'assinatura'">
+                                    Repetir Config
+                                  </th>
+                                  <th class="text-center" v-if="tipoRdo !== 'assinatura'">
+                                    Deletar
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  v-for="item in desserts"
+                                  :key="item.nome"
                                 >
-                                  <template v-slot:activator="{ on, attrs }">
+                                  <td class="text-left">{{ item.idEfetivo }}</td>
+                                  <td class="text-left">{{ item.nomeEfetivo }}</td>
+                                  <td class="text-left">{{ item.funcaoEfetivo }}</td>
+                                  <td class="text-center">{{ item.horaNormalTotal }}</td>
+                                  <td class="text-center">{{ item.horaNormalExtraTotal }}</td>
+                                  <td class="text-center">{{ item.horaNormalNoturnaTotal }}</td>
+                                  <td class="text-center">{{ item.horaExtraNoturnaTotal }}</td>
+                                  <td class="text-center">{{ item.horaExtraFdsTotal }}</td>
+                                  <td v-if="tipoRdo !== 'assinatura'">
                                     <v-btn
-                                      color="primary"
+                                      fab
                                       dark
-                                      class="mb-2"
-                                      v-bind="attrs"
-                                      v-on="on"
+                                      x-small
+                                      color="primary"
+                                      @click="adicionarHoras(item)"
                                     >
-                                      Adicionar Efetivo
+                                      <v-icon dark>
+                                        mdi-plus
+                                      </v-icon>
                                     </v-btn>
-                                  </template>
-                                  <v-card>
-                                    <v-card-title>
-                                      <span class="headline">{{ formTitle }}</span>
-                                    </v-card-title>
+                                  </td>
 
-                                    <v-card-text>
-                                      <v-container>
-                                        <v-row>
-                                          <v-col
-                                            cols="12"
-                                            sm="12"
-                                            md="12"
-                                          >
-                                            <v-autocomplete
-                                              v-model="editedItem.name"
-                                              :items="arrayColaboradores"
-                                              label="Encarregado"
-                                              @change="ajusteNome()"
-                                              clearable
-                                            ></v-autocomplete>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="12"
-                                            md="12"
-                                          >
-                                          <h4>Hora Normal</h4>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalInicio"
-                                              label="Início"
-                                              @change="horaNormal()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalTermino"
-                                              label="Término"
-                                              @change="horaNormal()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalTotal"
-                                              label="Total"
-                                              disabled
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="12"
-                                            md="12"
-                                          >
-                                            <h4>Hora Extra Seg A Sáb</h4>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalExtraInicio"
-                                              label="Início"
-                                              @change="horaNormalExtra()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalExtraTermino"
-                                              label="Termino"
-                                              @change="horaNormalExtra()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalExtraTotal"
-                                              label="Total"
-                                              disabled
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="12"
-                                            md="12"
-                                          >
-                                            <h4>Hora Normal Noturna</h4>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalNoturnaInicio"
-                                              label="Início"
-                                              @change="horaNormalNoturna()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalNoturnaTermino"
-                                              label="Termino"
-                                              @change="horaNormalNoturna()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaNormalNoturnaTotal"
-                                              label="Total"
-                                              disabled
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="12"
-                                            md="12"
-                                          >
-                                            <h4>Hora Extra Noturna</h4>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaExtraNoturnaInicio"
-                                              label="Início"
-                                              @change="horaExtraNoturna()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaExtraNoturnaTermino"
-                                              label="Termino"
-                                              @change="horaExtraNoturna()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaExtraNoturnaTotal"
-                                              label="Total"
-                                              disabled
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="12"
-                                            md="12"
-                                          >
-                                            <h4>Hora Extra Dom e Feriado</h4>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaExtraFdsInicio"
-                                              label="Início"
-                                              @change="horaExtraFds()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaExtraFdsTermino"
-                                              label="Termino"
-                                              @change="horaExtraFds()"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItem.horaExtraFdsTotal"
-                                              label="Total"
-                                              disabled
-                                            ></v-text-field>
-                                          </v-col>
-                                        </v-row>
-                                      </v-container>
-                                    </v-card-text>
+                                  <td v-if="tipoRdo !== 'assinatura'">
+                                    <v-btn
+                                      fab
+                                      dark
+                                      x-small
+                                      color="orange"
+                                      @click="repetirConfiguracoes(item)"
+                                    >
+                                      <v-icon dark>
+                                        mdi-cached
+                                      </v-icon>
+                                    </v-btn>
+                                  </td>
 
-                                    <v-card-actions>
-                                      <v-spacer></v-spacer>
-                                      <v-btn
-                                        color="blue darken-1"
-                                        text
-                                        @click="close"
-                                      >
-                                        Cancel
-                                      </v-btn>
-                                      <v-btn
-                                        color="green darken-1"
-                                        text
-                                        @click="save"
-                                      >
-                                        Salvar
-                                      </v-btn>
-                                    </v-card-actions>
-                                  </v-card>
-                                </v-dialog>
-                                <v-dialog v-model="dialogDelete" max-width="500px">
-                                  <v-card>
-                                    <v-card-title class="headline">Tem certeza que vai excluir?</v-card-title>
-                                    <v-card-actions>
-                                      <v-spacer></v-spacer>
-                                      <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                                      <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-                                      <v-spacer></v-spacer>
-                                    </v-card-actions>
-                                  </v-card>
-                                </v-dialog>
-                              </v-toolbar>
+                                  <td v-if="tipoRdo !== 'assinatura'">
+                                    <v-btn
+                                      fab
+                                      dark
+                                      x-small
+                                      color="red"
+                                      @click="deleteEfetivos(item)"
+                                    >
+                                      <v-icon dark>
+                                        mdi-delete
+                                      </v-icon>
+                                    </v-btn>
+                                  </td>
+                                </tr>
+                              </tbody>
                             </template>
-                            <template v-slot:[`item.actions`]="{ item }">
-                              <v-icon
-                                small
-                                class="mr-2"
-                                @click="editItem(item)"
-                              >
-                                mdi-pencil
-                              </v-icon>
-                              <v-icon
-                                small
-                                @click="deleteItem(item)"
-                              >
-                                mdi-delete
-                              </v-icon>
-                            </template>
-                          </v-data-table>
+                          </v-simple-table>
                           </v-col>
                         </v-row>
                       </v-card>
@@ -836,6 +655,7 @@
                             :items="opcoes"
                             solo
                             clearable
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                           </v-select>
                           </v-col>
@@ -868,6 +688,7 @@
                             :items="opcoes"
                             solo
                             clearable
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                           </v-select>
                           </v-col>
@@ -900,6 +721,7 @@
                             :items="opcoes"
                             solo
                             clearable
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                           </v-select>
                           </v-col>
@@ -932,6 +754,7 @@
                             :items="opcoes"
                             solo
                             clearable
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                           </v-select>
                           </v-col>
@@ -973,6 +796,7 @@
                               label="Serviço"
                               class="pt-2"
                               solo
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             ></v-text-field>
                           </v-col>
                           <v-col
@@ -993,6 +817,7 @@
                             offset-y
                             max-width="290px"
                             min-width="290px"
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                             <template v-slot:activator="{ on, attrs }">
                               <v-text-field
@@ -1033,6 +858,7 @@
                             offset-y
                             max-width="290px"
                             min-width="290px"
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                             <template v-slot:activator="{ on, attrs }">
                               <v-text-field
@@ -1073,6 +899,7 @@
                             offset-y
                             max-width="290px"
                             min-width="290px"
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                             <template v-slot:activator="{ on, attrs }">
                               <v-text-field
@@ -1113,6 +940,7 @@
                             offset-y
                             max-width="290px"
                             min-width="290px"
+                            :disabled="tipoRdo === 'assinatura' ? true : false"
                           >
                             <template v-slot:activator="{ on, attrs }">
                               <v-text-field
@@ -1175,6 +1003,7 @@
                                       v-bind="attrs"
                                       v-on="on"
                                       @click="changeId()"
+                                      v-if="tipoRdo !== 'assinatura'"
                                     >
                                       Adicionar Atividade
                                     </v-btn>
@@ -1273,7 +1102,7 @@
                                       </v-container>
                                     </v-card-text>
 
-                                    <v-card-actions>
+                                    <v-card-actions v-if="tipoRdo !== 'assinatura'">
                                       <v-spacer></v-spacer>
                                       <v-btn
                                         color="blue darken-1"
@@ -1305,7 +1134,7 @@
                                 </v-dialog>
                               </v-toolbar>
                             </template>
-                            <template v-slot:[`item.actions`]="{ item }">
+                            <template v-slot:[`item.actions`]="{ item }" v-if="tipoRdo !== 'assinatura'">
                               <v-icon
                                 small
                                 class="mr-2"
@@ -1362,7 +1191,92 @@
                               auto-grow
                               clearable
                               rows="4"
+                              :disabled="tipoRdo === 'assinatura' ? true : false"
                             ></v-textarea>
+                          </v-col>
+                        </v-row>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="px-5 py-2">
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                    >
+                      <v-card class="color-card" v-if="tipoRdo === 'assinatura'">
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                          <h4>COMENTÁRIOS  CONTRATANTE</h4>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            md="12"
+                            lg="12"
+                            sm="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                            <v-textarea
+                              solo
+                              v-model="comentariosContratante"
+                              label="Comentários"
+                              auto-grow
+                              clearable
+                              rows="4"
+                            ></v-textarea>
+                          </v-col>
+                        </v-row>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-row class="px-5 py-2 d-flex justify-center" v-if="tipoRdo === 'assinatura'">
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                    >
+                      <v-card class="color-card">
+                        <v-row class="px-5 d-flex justify-center">
+                          <v-col
+                            cols="12"
+                            md="3"
+                            lg="3"
+                            sm="3"
+                            xs="3"
+                            class="text-center"
+                          >
+                          <h4>ASSINATURA CONTRATANTE</h4>
+                          </v-col>
+                        </v-row>
+                        <v-row class="px-5 d-flex flex-column justify-space-between align-center">
+                          <v-col
+                            cols="12"
+                            md="3"
+                            lg="3"
+                            sm="3"
+                            xs="3"
+                            class="text-center"
+                          >
+                          <v-img
+                            max-height="149"
+                            max-width="250"
+                            :src="urlAssinatura"
+                            position="center"
+                          ></v-img>
                           </v-col>
                         </v-row>
                       </v-card>
@@ -1377,10 +1291,24 @@
                       sm="12"
                       xs="12"
                       class="mt-7 text-right"
+                      v-if="tipoRdo !== 'assinatura'"
                     >
                     <v-btn @click="salvarRDO('salvar')" color="green" class="mr-3 white--text">Salvar</v-btn>
                     <v-btn @click="modalFinalizado = true" class="mr-3 white--text" color="orange darken-4">Finalizar</v-btn>
                     <v-btn @click="returnRDO()" color="primary">Voltar</v-btn>
+                    </v-col>
+
+                    <v-col
+                      cols="12"
+                      md="12"
+                      lg="12"
+                      sm="12"
+                      xs="12"
+                      class="mt-7 text-right"
+                      v-if="tipoRdo === 'assinatura'"
+                    >
+                    <v-btn @click="verificarAssinatura()" color="green" class="mr-3 white--text">Assinar</v-btn>
+                    <v-btn @click="returnAssinatura()" color="primary">Voltar</v-btn>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -1389,6 +1317,242 @@
           </v-flex>
         </v-layout>
       </v-container>
+
+      <v-dialog
+        v-model="dialogHoraEfetivo"
+        transition="dialog-top-transition"
+        max-width="600"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >Adicionar Hora Efetivo</v-toolbar>
+            <v-card-text>
+              <v-form
+                ref="form"
+              >
+                  <v-container fluid>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      sm="12"
+                      md="12"
+                    >
+                    <h4>Hora Normal</h4>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalInicio"
+                        label="Início"
+                        @change="horaNormal()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalTermino"
+                        label="Término"
+                        @change="horaNormal()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalTotal"
+                        label="Total"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="12"
+                      md="12"
+                    >
+                      <h4>Hora Extra Seg A Sáb</h4>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalExtraInicio"
+                        label="Início"
+                        @change="horaNormalExtra()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalExtraTermino"
+                        label="Termino"
+                        @change="horaNormalExtra()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalExtraTotal"
+                        label="Total"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="12"
+                      md="12"
+                    >
+                      <h4>Hora Normal Noturna</h4>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalNoturnaInicio"
+                        label="Início"
+                        @change="horaNormalNoturna()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalNoturnaTermino"
+                        label="Termino"
+                        @change="horaNormalNoturna()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaNormalNoturnaTotal"
+                        label="Total"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="12"
+                      md="12"
+                    >
+                      <h4>Hora Extra Noturna</h4>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaExtraNoturnaInicio"
+                        label="Início"
+                        @change="horaExtraNoturna()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaExtraNoturnaTermino"
+                        label="Termino"
+                        @change="horaExtraNoturna()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaExtraNoturnaTotal"
+                        label="Total"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="12"
+                      md="12"
+                    >
+                      <h4>Hora Extra Dom e Feriado</h4>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaExtraFdsInicio"
+                        label="Início"
+                        @change="horaExtraFds()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaExtraFdsTermino"
+                        label="Termino"
+                        @change="horaExtraFds()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.horaExtraFdsTotal"
+                        label="Total"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  </v-container>
+              </v-form>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="dialogHoraEfetivo = false"
+              >Close</v-btn>
+              <v-btn
+                color="green"
+                text
+                @click="salvarHoraEfetivo()"
+              >Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
 
       <v-dialog
         v-model="modalFinalizado"
@@ -1437,6 +1601,18 @@
         </template>
       </v-snackbar>
 
+      <v-dialog v-model="dialogDeleteEfetivo" max-width="500px">
+        <v-card>
+          <v-card-title class="headline">Tem certeza que vai excluir?</v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+            <v-btn color="blue darken-1" text @click="deleteEfetivoConfirm">OK</v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <v-dialog
         v-model="dialogoRespostaErro"
         width="500"
@@ -1465,11 +1641,11 @@ import ModalRespostaErro from '../../ComponeteGlobal/ModalRespostaErro.vue'
 import ModalRespostaCorreto from '../../ComponeteGlobal/ModalRespostaCorreto.vue'
 export default {
   components: { ModalRespostaErro, ModalRespostaCorreto },
-  props: ['tipoRdo', 'rdoEdit'],
+  props: ['tipoRdo', 'rdoEdit', 'rdoCopi', 'rdoAssinatura'],
   mounted () {
+    console.log(this.tipoRdo)
     if (this.tipoRdo === 'editar') {
-      this.dateFormatted = this.rdoEdit.dataIncioConfig
-
+      this.dataRdoInicio = this.rdoEdit.dataIncioConfig
       this.nomeCliente = this.rdoEdit.rdo.cliente
       this.nomeProjetos = this.rdoEdit.rdo.projeto
       this.dataIDRDO = this.rdoEdit.rdo.id_rdo
@@ -1496,8 +1672,94 @@ export default {
       this.terminoPrevisto = this.rdoEdit.rdo.terminoPrevisto
       this.comentarios = this.rdoEdit.rdo.comentarios
       this.dataCriacao = this.rdoEdit.rdo.dataCriacao
+      this.seguencia = this.rdoEdit.rdo.sequencia
 
       console.log(this.rdoEdit)
+    } else if (this.tipoRdo === 'copiar') {
+      this.areaAtuacao = this.rdoCopi.rdo.areaAtuacao
+      this.cartaChamada = this.rdoCopi.rdo.cartaChamada
+      this.nomeFiscal = this.rdoCopi.rdo.nomeFiscal
+      this.nomeEncarregado = this.rdoCopi.rdo.nomeEncarregado
+      this.condicaoManha = this.rdoCopi.rdo.condicaoManha
+      this.condicaoTarde = this.rdoCopi.rdo.condicaoTarde
+      this.condicaoNoite = this.rdoCopi.rdo.condicaoNoite
+      this.prazoAtividade = this.rdoCopi.rdo.prazoAtividade
+      this.diasDecorridos = this.rdoCopi.rdo.diasDecorridos
+      this.prorrogacao = this.rdoCopi.rdo.prorrogacao
+      this.diasRestantes = this.rdoCopi.rdo.diasRestantes
+      this.diasDeAtrazos = this.rdoCopi.rdo.diasDeAtrazos
+      this.opcoesDDS = this.rdoCopi.rdo.opcoesDDS
+      this.opcoesPrejuizo = this.rdoCopi.rdo.opcoesPrejuizo
+      this.opcoesViolacao = this.rdoCopi.rdo.opcoesViolacao
+      this.opcoesOciosidade = this.rdoCopi.rdo.opcoesOciosidade
+      this.servico = this.rdoCopi.rdo.servico
+      this.inicioReal = this.rdoCopi.rdo.inicioReal
+      this.terminoReal = this.rdoCopi.rdo.terminoReal
+      this.inicioPrevisto = this.rdoCopi.rdo.inicioPrevisto
+      this.terminoPrevisto = this.rdoCopi.rdo.terminoPrevisto
+      this.comentarios = this.rdoCopi.rdo.comentarios
+      this.dataCriacao = this.rdoCopi.rdo.dataCriacao
+
+      console.log(this.rdoCopi)
+    } else if (this.tipoRdo === 'assinatura') {
+      this.dataRdoInicio = this.rdoAssinatura.dataIncioConfig
+      this.nomeCliente = this.rdoAssinatura.rdo.cliente
+      this.nomeProjetos = this.rdoAssinatura.rdo.projeto
+      this.dataIDRDO = this.rdoAssinatura.rdo.id_rdo
+      this.areaAtuacao = this.rdoAssinatura.rdo.areaAtuacao
+      this.cartaChamada = this.rdoAssinatura.rdo.cartaChamada
+      this.nomeFiscal = this.rdoAssinatura.rdo.nomeFiscal
+      this.nomeEncarregado = this.rdoAssinatura.rdo.nomeEncarregado
+      this.condicaoManha = this.rdoAssinatura.rdo.condicaoManha
+      this.condicaoTarde = this.rdoAssinatura.rdo.condicaoTarde
+      this.condicaoNoite = this.rdoAssinatura.rdo.condicaoNoite
+      this.prazoAtividade = this.rdoAssinatura.rdo.prazoAtividade
+      this.diasDecorridos = this.rdoAssinatura.rdo.diasDecorridos
+      this.prorrogacao = this.rdoAssinatura.rdo.prorrogacao
+      this.diasRestantes = this.rdoAssinatura.rdo.diasRestantes
+      this.diasDeAtrazos = this.rdoAssinatura.rdo.diasDeAtrazos
+      this.opcoesDDS = this.rdoAssinatura.rdo.opcoesDDS
+      this.opcoesPrejuizo = this.rdoAssinatura.rdo.opcoesPrejuizo
+      this.opcoesViolacao = this.rdoAssinatura.rdo.opcoesViolacao
+      this.opcoesOciosidade = this.rdoAssinatura.rdo.opcoesOciosidade
+      this.servico = this.rdoAssinatura.rdo.servico
+      this.inicioReal = this.rdoAssinatura.rdo.inicioReal
+      this.terminoReal = this.rdoAssinatura.rdo.terminoReal
+      this.inicioPrevisto = this.rdoAssinatura.rdo.inicioPrevisto
+      this.terminoPrevisto = this.rdoAssinatura.rdo.terminoPrevisto
+      this.comentarios = this.rdoAssinatura.rdo.comentarios
+      this.dataCriacao = this.rdoAssinatura.rdo.dataCriacao
+      this.seguencia = this.rdoAssinatura.rdo.sequencia
+
+      console.log(this.rdoAssinatura)
+
+      this.assinaturaAws()
+    } else {
+      this.dataRdoInicio = moment(new Date()).locale('pt-br').format('L')
+      this.nomeCliente = ''
+      this.nomeProjetos = ''
+      this.areaAtuacao = ''
+      this.cartaChamada = ''
+      this.nomeFiscal = ''
+      this.nomeEncarregado = ''
+      this.condicaoManha = ''
+      this.condicaoTarde = ''
+      this.condicaoNoite = ''
+      this.prazoAtividade = 0
+      this.diasDecorridos = 0
+      this.prorrogacao = 0
+      this.diasRestantes = 0
+      this.diasDeAtrazos = 0
+      this.opcoesDDS = ''
+      this.opcoesPrejuizo = ''
+      this.opcoesViolacao = ''
+      this.opcoesOciosidade = ''
+      this.servico = ''
+      this.inicioReal = 0
+      this.terminoReal = 0
+      this.inicioPrevisto = 0
+      this.terminoPrevisto = 0
+      this.comentarios = ''
     }
   },
   data: vm => ({
@@ -1634,8 +1896,7 @@ export default {
     nomeCliente: '',
     nomeProjetos: '',
     dataIDRDO: moment(new Date()).valueOf(),
-    dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
-    dataRdoInicio: moment(new Date()).format('L'),
+    dataRdoInicio: moment(new Date()).locale('pt-br').format('L'),
     areaAtuacao: '',
     cartaChamada: '',
     nomeFiscal: '',
@@ -1657,7 +1918,14 @@ export default {
     terminoReal: 0,
     inicioPrevisto: 0,
     terminoPrevisto: 0,
-    comentarios: ''
+    comentarios: '',
+
+    efetivosArray: '',
+    dialogHoraEfetivo: false,
+    dialogDeleteEfetivo: false,
+    seguencia: 0,
+    comentariosContratante: '',
+    urlAssinatura: ''
   }),
   async created () {
     await this.getClientes()
@@ -1681,9 +1949,6 @@ export default {
     }
   },
   watch: {
-    date (val) {
-      this.dateFormatted = this.formatDate(this.date)
-    },
     dialog (val) {
       val || this.close()
     },
@@ -1746,6 +2011,19 @@ export default {
       console.log(this.arrayColaboradores)
     },
 
+    async buscarSeguencial () {
+      const params = {
+        nomeCliente: this.nomeCliente ? this.nomeCliente : '',
+        nomeProjetos: this.nomeProjetos ? this.nomeProjetos : ''
+      }
+      const result = await axios({
+        method: 'POST',
+        url: `${this.urlProd}get-seguencia-rdo`,
+        data: params
+      })
+      this.seguencia = result.data.numSeguencia
+    },
+
     diaDaSemana () {
       const semana = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado']
       const d = new Date()
@@ -1771,7 +2049,6 @@ export default {
           nomeProjetos: this.nomeProjetos ? this.nomeProjetos : '',
           dataRdo: this.dataRdoInicio ? this.dataRdoInicio : null,
           diaSemana: this.diaSemana ? this.diaSemana : '',
-          dateFormatted: this.dataRdoInicio ? moment(this.dataRdoInicio).valueOf() : moment(new Date()).valueOf(),
           dataIDRDO: this.dataIDRDO ? this.dataIDRDO : moment(new Date()).valueOf(),
           areaAtuacao: this.areaAtuacao ? this.areaAtuacao : '',
           cartaChamada: this.cartaChamada ? this.cartaChamada : '',
@@ -1798,9 +2075,12 @@ export default {
           efetivos: this.desserts,
           atividades: this.dessertsAtividade,
           dataCriacao: this.dataCriacao ? this.dataCriacao : moment(new Date()).valueOf(),
-          dataFinalizado: moment(new Date()).valueOf()
+          dataFinalizado: moment(new Date()).valueOf(),
+          sequencial: this.seguencia ? this.seguencia : 1,
+          comentariosContratante: this.tipoRdo === 'assinatura' ? this.comentariosContratante : null,
+          urlAssinatura: this.tipoRdo === 'assinatura' ? this.urlAssinatura : null
         }
-        if (this.tipoRdo === 'editar') {
+        if (this.tipoRdo === 'editar' || this.tipoRdo === 'assinatura') {
           console.log(this.tipoRdo, params)
           try {
             await axios({
@@ -1808,8 +2088,12 @@ export default {
               url: `${this.urlProd}editar-rdo`,
               data: params
             })
-            this.dialogoRespostaCorreto = true
-            this.returnRDO()
+            if (this.tipoRdo === 'editar') {
+              this.dialogoRespostaCorreto = true
+              this.returnRDO()
+            } else {
+              this.returnAssinatura()
+            }
           } catch (err) {
             console.log(err)
             this.dialogoRespostaErro = true
@@ -1849,12 +2133,25 @@ export default {
     returnRDO () {
       this.$emit('voltar')
     },
+    returnAssinatura () {
+      this.$emit('voltarAssinatura')
+    },
 
     initialize () {
       if (this.tipoRdo === 'editar') {
         const qtdEfeti = this.rdoEdit.efetivos.length
         for (let y = 0; y < qtdEfeti; y++) {
           this.desserts.push(this.rdoEdit.efetivos[y])
+        }
+      } else if (this.tipoRdo === 'copiar') {
+        const qtdEfeti = this.rdoCopi.efetivos.length
+        for (let y = 0; y < qtdEfeti; y++) {
+          this.desserts.push(this.rdoCopi.efetivos[y])
+        }
+      } else if (this.tipoRdo === 'assinatura') {
+        const qtdEfeti = this.rdoAssinatura.efetivos.length
+        for (let y = 0; y < qtdEfeti; y++) {
+          this.desserts.push(this.rdoAssinatura.efetivos[y])
         }
       } else {
         this.desserts = []
@@ -1868,15 +2165,21 @@ export default {
           this.rdoEdit.atividade[x].id = x + 1
           this.dessertsAtividade.push(this.rdoEdit.atividade[x])
         }
+      } else if (this.tipoRdo === 'copiar') {
+        const qtdAtiv = this.rdoCopi.atividade.length
+        for (let x = 0; x < qtdAtiv; x++) {
+          this.rdoCopi.atividade[x].id = x + 1
+          this.dessertsAtividade.push(this.rdoCopi.atividade[x])
+        }
+      } else if (this.tipoRdo === 'assinatura') {
+        const qtdAtiv = this.rdoAssinatura.atividade.length
+        for (let x = 0; x < qtdAtiv; x++) {
+          this.rdoAssinatura.atividade[x].id = x + 1
+          this.dessertsAtividade.push(this.rdoAssinatura.atividade[x])
+        }
       } else {
         this.dessertsAtividade = []
       }
-    },
-
-    editItem (item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialog = true
     },
 
     editItemAtividade (item) {
@@ -1885,21 +2188,10 @@ export default {
       this.dialogAtividade = true
     },
 
-    deleteItem (item) {
-      this.editedIndex = this.desserts.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
-    },
-
     deleteItemAtividade (item) {
       this.editedIndexAtividade = this.dessertsAtividade.indexOf(item)
       this.editedItemAtividade = Object.assign({}, item)
       this.dialogDeleteAtividade = true
-    },
-
-    deleteItemConfirm () {
-      this.desserts.splice(this.editedIndex, 1)
-      this.closeDelete()
     },
 
     deleteItemConfirmAtividade () {
@@ -1909,6 +2201,7 @@ export default {
 
     close () {
       this.dialog = false
+      this.dialogHoraEfetivo = false
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
@@ -1925,7 +2218,7 @@ export default {
     },
 
     closeDelete () {
-      this.dialogDelete = false
+      this.dialogDeleteEfetivo = false
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
@@ -1942,6 +2235,7 @@ export default {
     },
 
     save () {
+      console.log(this.editedIndex)
       if (this.editedIndex > -1) {
         Object.assign(this.desserts[this.editedIndex], this.editedItem)
       } else {
@@ -1957,13 +2251,6 @@ export default {
         this.dessertsAtividade.push(this.editedItemAtividade)
       }
       this.closeAtividade()
-    },
-
-    ajusteNome () {
-      const ajuste = this.editedItem.name.split('-')
-      this.editedItem.idEfetivo = ajuste[0] * 1
-      this.editedItem.nomeEfetivo = ajuste[1]
-      this.editedItem.funcaoEfetivo = ajuste[2]
     },
 
     horaNormal () {
@@ -1998,7 +2285,127 @@ export default {
 
     changeId () {
       this.editedItemAtividade.id = this.dessertsAtividade.length + 1
+    },
+    ajusteNome () {
+      const ajuste = this.editedItem.name.split('-')
+      this.editedItem.idEfetivo = ajuste[0] * 1
+      this.editedItem.nomeEfetivo = ajuste[1]
+      this.editedItem.funcaoEfetivo = ajuste[2]
+    },
+
+    adiconarColaboradores () {
+      const splitElement = this.efetivosArray.split('-')
+      console.log(splitElement)
+
+      const idVerif = splitElement[0] * 1
+      const verificarColab = this.desserts.filter(item => { return item.idEfetivo === idVerif })
+
+      console.log('verificar', verificarColab.length)
+
+      if (verificarColab.length > 0) {
+        this.snackbar = true
+        this.mensagem = 'Colaborador ja esta adicionado'
+        this.colorSnackbar = 'red'
+      } else {
+        const obj = {
+          name: this.efetivosArray,
+          idEfetivo: splitElement[0] * 1,
+          nomeEfetivo: splitElement[1].trim(),
+          funcaoEfetivo: splitElement[2].trim(),
+          horaNormalInicio: 0,
+          horaNormalTermino: 0,
+          horaNormalTotal: 0,
+          horaNormalExtraInicio: 0,
+          horaNormalExtraTermino: 0,
+          horaNormalExtraTotal: 0,
+          horaNormalNoturnaInicio: 0,
+          horaNormalNoturnaTermino: 0,
+          horaNormalNoturnaTotal: 0,
+          horaExtraNoturnaInicio: 0,
+          horaExtraNoturnaTermino: 0,
+          horaExtraNoturnaTotal: 0,
+          horaExtraFdsInicio: 0,
+          horaExtraFdsTermino: 0,
+          horaExtraFdsTotal: 0
+        }
+        this.desserts.push(obj)
+      }
+    },
+
+    adicionarHoras (item) {
+      this.editedIndex = this.desserts.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogHoraEfetivo = true
+    },
+
+    salvarHoraEfetivo () {
+      console.log(this.editedIndex)
+      if (this.editedIndex > -1) {
+        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+      } else {
+        this.desserts.push(this.editedItem)
+      }
+      this.close()
+    },
+
+    deleteEfetivos (item) {
+      this.editedIndex = this.desserts.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogDeleteEfetivo = true
+    },
+
+    deleteEfetivoConfirm () {
+      this.desserts.splice(this.editedIndex, 1)
+      this.closeDelete()
+    },
+
+    repetirConfiguracoes (item) {
+      for (const efetivos of this.desserts) {
+        efetivos.horaNormalInicio = item.horaNormalInicio
+        efetivos.horaNormalTermino = item.horaNormalTermino
+        efetivos.horaNormalTotal = item.horaNormalTotal
+        efetivos.horaNormalExtraInicio = item.horaNormalExtraInicio
+        efetivos.horaNormalExtraTermino = item.horaNormalExtraTermino
+        efetivos.horaNormalExtraTotal = item.horaNormalExtraTotal
+        efetivos.horaNormalNoturnaInicio = item.horaNormalNoturnaInicio
+        efetivos.horaNormalNoturnaTermino = item.horaNormalNoturnaTermino
+        efetivos.horaNormalNoturnaTotal = item.horaNormalNoturnaTotal
+        efetivos.horaExtraNoturnaInicio = item.horaExtraNoturnaInicio
+        efetivos.horaExtraNoturnaTermino = item.horaExtraNoturnaTermino
+        efetivos.horaExtraNoturnaTotal = item.horaExtraNoturnaTotal
+        efetivos.horaExtraFdsInicio = item.horaExtraFdsInicio
+        efetivos.horaExtraFdsTermino = item.horaExtraFdsTermino
+        efetivos.horaExtraFdsTotal = item.horaExtraFdsTotal
+      }
+    },
+
+    async assinaturaAws () {
+      try {
+        console.log('Pegar assinatura')
+
+        const ajusteFiscal = this.nomeFiscal.split('-')
+        const idFiscal = ajusteFiscal[0].trim()
+
+        const params = {
+          idFiscal: idFiscal
+        }
+        const result = await axios({
+          method: 'POST',
+          url: `${this.urlProd}aws-assinatura`,
+          data: params
+        })
+
+        console.log('assinatura', result.data)
+        this.urlAssinatura = result.data
+      } catch (err) {
+        console.log('Erro assinatura', err)
+      }
+    },
+
+    async verificarAssinatura () {
+      this.salvarRDO('assinar')
     }
+
   }
 
 }

@@ -127,12 +127,11 @@ export default {
         {
           principal: {
             title: 'Usuario',
-            icon: 'mdi-account',
-            permissao: ['P_USER']
+            icon: 'mdi-account'
           },
           submenus: [
             { title: 'Usuario', link: 'User', icon: 'mdi-account-edit' },
-            { title: 'Assinatura RDO', link: 'Assinatura', icon: 'mdi-pencil' }
+            { title: 'Assinatura Eletronica', link: 'AssinaturaEletronica', icon: 'mdi-pencil-box' }
           ]
         },
         {
@@ -145,8 +144,6 @@ export default {
             { title: 'Colaboradores', link: 'Colaboradores', icon: 'mdi-account-multiple-plus' },
             { title: 'Novo Acesso', link: 'NewAccess', icon: 'mdi-account-plus' },
             { title: 'Permissão Acesso', link: 'Permissao', icon: 'mdi-lock-open' },
-            { title: 'Clientes', link: 'Clientes', icon: 'mdi-factory' },
-            { title: 'Projetos', link: 'Projetos', icon: 'mdi-folder-plus' },
             { title: 'Funcao', link: 'Funcao', icon: 'mdi-wrench' }
           ]
         },
@@ -157,7 +154,10 @@ export default {
             permissao: ['P_RDO']
           },
           submenus: [
-            { title: 'RDO', link: 'RDO', icon: 'mdi-file-plus' }
+            { title: 'Clientes', link: 'Clientes', icon: 'mdi-factory' },
+            { title: 'Projetos', link: 'Projetos', icon: 'mdi-folder-plus' },
+            { title: 'RDO', link: 'RDO', icon: 'mdi-file-plus' },
+            { title: 'Assinatura RDO', link: 'Assinatura', icon: 'mdi-pencil' }
             // { title: 'Dashboard', icon: 'mdi-file-plus' }
           ]
         }
@@ -190,30 +190,27 @@ export default {
       this.$router.push({ name: 'Home' })
     },
 
-    getPermisson () {
-
-    },
-
     permissionPage (item) {
-      console.log('user', this.user.permissao)
-      console.log('item', item.principal.permissao)
-      console.log('includes', this.user.permissao.includes('ADMIN'))
-      if (item.principal.permissao) {
-        if (this.user.permissao.includes('ADMIN')) {
-          return true
-        } else {
-          const r1 = this.user.permissao
-          const r2 = item.principal.permissao
-          const r3 = r1.filter(a => r2.includes(a))
-          console.log(r3)
-          if (r3.length > 0) {
+      if (this.user.permissao) {
+        if (item.principal.permissao) {
+          if (this.user.permissao.includes('ADMIN')) {
             return true
           } else {
-            return false
+            const r1 = this.user.permissao
+            const r2 = item.principal.permissao
+            const r3 = r1.filter(a => r2.includes(a))
+            console.log(r3)
+            if (r3.length > 0) {
+              return true
+            } else {
+              return false
+            }
           }
+        } else {
+          return true
         }
       } else {
-        return true
+        return false
       }
     }
   }

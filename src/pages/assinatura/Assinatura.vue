@@ -1,6 +1,6 @@
 <template>
-  <div class="home">
-    <v-container>
+  <div class="home" >
+    <v-container v-if="showAssinatura">
       <v-layout row wrap>
         <v-flex sm12 xs12 md12 lg12 class="mt-10">
           <v-card-title class="align-start">
@@ -167,7 +167,7 @@
                     class="pl-3"
                     style="text-align:right"
                     v-model="switchStatusRdo"
-                    :label="`Buscar RDO ${switchStatusRdo ? 'Em Andamento' : 'Finalizado'}`"
+                    :label="`Buscar RDO ${switchStatusRdo ? 'Em Andamento' : 'Assinada'}`"
                     @click="mudarStatus()"
                   >
                   </v-switch>
@@ -189,53 +189,39 @@
                       class="elevation-1 color-table"
                     >
 
-                    <template v-slot:[`item.download`]="{ item }">
+                    <template v-slot:[`item.assinarRDO`]="{ item }">
                       <v-btn
+                        v-if="item.rdo.status === 'Enviado'"
                         width="30px"
                         height="30px"
                         fab
                         dark
                         small
                         color="orange"
-                        @click="downloadPdf(item.rdo.id_rdo)"
+                        @click="assinarRdo(item)"
                       >
                       <v-icon dark small>
-                        mdi-file-pdf
-                      </v-icon>{{ item.download }}
+                        mdi-pencil
+                      </v-icon>{{ item.assinarRDO }}
                       </v-btn>
+                      <span v-else>RDO Assinada</span>
                     </template>
 
-                    <template v-slot:[`item.assinar`]="{ item }">
+                    <template v-slot:[`item.download`]="{ item }">
                       <v-btn
+                        v-if="item.rdo.status === 'Assinado'"
                         width="30px"
                         height="30px"
                         fab
                         dark
                         small
                         color="primary"
-                        @click="sendRdo(item.rdo.id_rdo)"
-                      >
-                      <v-icon dark small>
-                        mdi-send mdi-rotate-315
-                      </v-icon>
-                      {{ item.assinar }}
-                      </v-btn>
-                    </template>
-
-                    <template v-slot:[`item.dowloadFinalizado`]="{ item }">
-                      <v-btn
-                        v-if="item.rdo.status === 'Finalizado'"
-                        width="30px"
-                        height="30px"
-                        fab
-                        dark
-                        small
-                        color="red"
-                        @click="downloadRDOFinalizados(item.rdo.id_rdo)"
+                        @click="downloadPdf(item.rdo.id_rdo)"
                       >
                       <v-icon dark small>
                         mdi-file-pdf
-                      </v-icon>{{ item.dowloadFinalizado }}
+                      </v-icon>
+                      {{ item.download }}
                       </v-btn>
                       <span v-else>Assinar RDO</span>
                     </template>
@@ -248,41 +234,6 @@
           </v-card>
         </v-flex>
       </v-layout>
-      <v-dialog
-        v-model="dialogAssinatura"
-        transition="dialog-top-transition"
-        max-width="600"
-      >
-        <template>
-          <v-card>
-            <v-toolbar
-              color="primary"
-              dark
-            >ENVIAR DOCUMENTO ASSINADO</v-toolbar>
-            <v-card-text>
-              <div class="text-h4 pa-5">Selecione o Arquivo que Deseja Enviar</div>
-              <input
-                type="file"
-                id="file"
-                ref= "file"
-                class="pa-5"
-                @change="handleFileUpload()"
-              />
-            </v-card-text>
-            <v-card-actions class="justify-end">
-              <v-btn
-                text
-                @click="dialogAssinatura = false"
-              >Close</v-btn>
-              <v-btn
-                color="green"
-                text
-                @click="submitFile()"
-              >Enviar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </v-dialog>
     </v-container>
     <v-dialog
         v-model="dialogoRespostaErro"
@@ -302,18 +253,27 @@
       />
     </v-dialog>
 
+    <novo-rdo
+      v-if="showNovoRdo"
+      v-on:voltarAssinatura="voltarAssinatura()"
+      :tipoRdo="tipoRdo"
+      :rdoEdit="rdoEdit"
+      :rdoCopi="rdoCopi"
+      :rdoAssinatura="rdoAssinatura"
+    />
+
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import AWS from 'aws-sdk'
 import axios from 'axios'
 import moment from 'moment'
 import ModalRespostaErro from '../ComponeteGlobal/ModalRespostaErro.vue'
 import ModalRespostaCorreto from '../ComponeteGlobal/ModalRespostaCorreto.vue'
+import NovoRdo from '../rdo/componente/NovoRdo.vue'
 export default {
-  components: { ModalRespostaErro, ModalRespostaCorreto },
+  components: { ModalRespostaErro, ModalRespostaCorreto, NovoRdo },
   name: 'Assinatura',
   computed: {
     ...mapState('auth', ['user'])
@@ -322,9 +282,8 @@ export default {
     dialogAssinatura: false,
     dialogoRespostaErro: false,
     dialogoRespostaCorreto: false,
-    file: '',
-    fileName: '',
     tipoRdo: '',
+    showAssinatura: true,
     showNovoRdo: false,
     clientes: [],
     nomeCliente: '',
@@ -337,6 +296,8 @@ export default {
     menu: false,
     rdoEdit: [],
     idRdo: '',
+    rdoCopi: [],
+    rdoAssinatura: [],
     urlProd: 'https://htgneexsa.cf/api_htg/',
     // urlProd: 'http://localhost:4040/api_htg/',
     headers: [
@@ -362,23 +323,23 @@ export default {
         align: 'center'
       },
       {
+        text: 'Sequência',
+        value: 'rdo.sequencia',
+        align: 'center'
+      },
+      {
         text: 'Status',
         value: 'rdo.status',
         align: 'center'
       },
       {
-        text: 'Download  RDO',
+        text: 'Assinar',
+        value: 'assinarRDO',
+        align: 'center'
+      },
+      {
+        text: 'RDO Assinada',
         value: 'download',
-        align: 'center'
-      },
-      {
-        text: 'Enviar RDO Assinado',
-        value: 'assinar',
-        align: 'center'
-      },
-      {
-        text: 'RDO Finalizada',
-        value: 'dowloadFinalizado',
         align: 'center'
       }
     ],
@@ -416,20 +377,6 @@ export default {
       window.open(result.data, '_blank')
     },
 
-    async downloadRDOFinalizados (id) {
-      console.log(id)
-      const params = {
-        id: id
-      }
-      const result = await axios({
-        method: 'POST',
-        url: `${this.urlProd}aws-pdf-finalizado`,
-        data: params
-      })
-
-      window.open(result.data, '_blank')
-    },
-
     async getRDO () {
       if (this.nomeCliente) {
         this.nomeProjetos = ''
@@ -446,14 +393,14 @@ export default {
         url: `${this.urlProd}rdos-user`,
         data: params
       })
+      console.log(result.data)
       this.resultArray = result.data.map(item => {
         return {
           ...item,
-          dataIncioConfig: moment(item.rdo.dataInicio).format('DD/MM/YYYY'),
-          status: item.rdo.status === 'Finalizado' ? 'Finalizado' : 'Em Andamento'
+          dataIncioConfig: moment(item.rdo.dataInicio).format('DD/MM/YYYY')
         }
       })
-      const arrayNovo = this.resultArray.filter(x => x.status === 'Em Andamento')
+      const arrayNovo = this.resultArray.filter(x => x.rdo.status === 'Enviado')
       this.desserts = arrayNovo
       console.log(this.desserts)
     },
@@ -479,86 +426,38 @@ export default {
       this.arrayProjetos = this.projetosCliente.map(x => { return x.projeto.nome })
     },
 
-    sendRdo (id) {
-      this.dialogAssinatura = true
-      this.idRdo = id
-    },
-
-    async submitFile () {
-      var albumBucketName = 'neexsa-htg-pdfs-finalizados'
-      var bucketRegion = 'sa-east-1'
-      var IdentityPoolId = 'sa-east-1:5b531b25-81be-487d-a257-e748a8129073'
-
-      AWS.config.update({
-        region: bucketRegion,
-        credentials: new AWS.CognitoIdentityCredentials({
-          IdentityPoolId: IdentityPoolId
-        })
-      })
-
-      var photoKey = this.idRdo.toString() + '.pdf'
-      console.log(photoKey)
-
-      // Use S3 ManagedUpload class as it supports multipart uploads
-      var upload = new AWS.S3.ManagedUpload({
-        params: {
-          Bucket: albumBucketName,
-          Key: photoKey,
-          Body: this.file
-        }
-      })
-
-      var promise = upload.promise()
-
-      promise.then(
-        function (data) {
-          return alert('Salvo com sucesso!!!')
-        },
-        function (err) {
-          console.log(err)
-          return alert('Erro ao salvar: ', err)
-        }
-      )
-
-      try {
-        const params = {
-          idRDO: this.idRdo,
-          status: 'Finalizado',
-          dataFinalizado: moment(new Date()).valueOf()
-        }
-        await axios({
-          method: 'POST',
-          url: `${this.urlProd}finalizar-rdo`,
-          data: params
-        })
-        this.getRDO()
-        this.dialogAssinatura = false
-        this.dialogoRespostaCorreto = true
-      } catch (err) {
-        console.log(err)
-        this.dialogoRespostaErro = true
-      }
-    },
-
-    sucesses () {
-      this.dialogAssinatura = false
-      this.dialogoRespostaCorreto = true
-    },
-
-    handleFileUpload () {
-      this.file = this.$refs.file.files[0]
-    },
-
     mudarStatus () {
       const switarray = this.resultArray
+      console.log(switarray)
       let switStatus = ''
-      console.log(this.switchStatusRdo)
+      // console.log(this.switchStatusRdo)
       if (this.switchStatusRdo) {
-        switStatus = 'Finalizado'
+        switStatus = 'Assinado'
       } else {
-        switStatus = 'Em Andamento'
+        switStatus = 'Enviado'
       }
-      this.desserts = switarray.filter(item => { return item.status === switStatus })
+      // console.log(switStatus)
+      this.desserts = switarray.filter(item => { return item.rdo.status === switStatus })
+      console.log('desserts', this.desserts)
+    },
+
+    assinarRdo (item) {
+      console.log(item)
+      this.rdoAssinatura = item
+      this.showAssinatura = false
+      this.showNovoRdo = true
+      this.tipoRdo = 'assinatura'
+    },
+    voltarAssinatura () {
+      this.showAssinatura = true
+      this.showNovoRdo = false
+      this.getRDO()
+
+      this.rdoEdit = []
+      this.rdoCopi = []
+      this.rdoAssinatura = []
+      this.tipoRdo = ''
+      // this.$router.push({ name: 'RDO' })
     }
   }
 }
