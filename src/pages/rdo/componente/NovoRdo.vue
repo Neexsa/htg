@@ -1925,7 +1925,13 @@ export default {
     dialogDeleteEfetivo: false,
     seguencia: 0,
     comentariosContratante: '',
-    urlAssinatura: ''
+    urlAssinatura: '',
+
+    maxHoraNormalTotal: 0,
+    maxHoraNormalExtraTotal: 0,
+    maxHoraNormalNoturnaTotal: 0,
+    maxHoraExtraNoturnaTotal: 0,
+    maxHoraExtraFdsTotal: 0
   }),
   async created () {
     await this.getClientes()
@@ -2040,8 +2046,20 @@ export default {
       this.arrayProjetos = this.projetosCliente.map(x => { return x.projeto.nome })
     },
 
+    async calculaTotalEfetivo (efetivos) {
+      for (const item of efetivos) {
+        this.maxHoraNormalTotal = this.maxHoraNormalTotal + item.horaNormalTotal
+        this.maxHoraNormalExtraTotal = this.maxHoraNormalExtraTotal + item.horaNormalExtraTotal
+        this.maxHoraNormalNoturnaTotal = this.maxHoraNormalNoturnaTotal + item.horaNormalNoturnaTotal
+        this.maxHoraExtraNoturnaTotal = this.maxHoraExtraNoturnaTotal + item.horaExtraNoturnaTotal
+        this.maxHoraExtraFdsTotal = this.maxHoraExtraFdsTotal + item.horaExtraFdsTotal
+      }
+      console.log('efetivos', this.maxHoraNormalTotal)
+    },
+
     async salvarRDO (tipo) {
       if (this.nomeCliente && this.nomeProjetos) {
+        await this.calculaTotalEfetivo(this.desserts)
         console.log(new Date(this.dataRdoInicio).valueOf())
         const params = {
           tipo: tipo,
@@ -2078,7 +2096,12 @@ export default {
           dataFinalizado: moment(new Date()).valueOf(),
           sequencial: this.seguencia ? this.seguencia : 1,
           comentariosContratante: this.tipoRdo === 'assinatura' ? this.comentariosContratante : null,
-          urlAssinatura: this.tipoRdo === 'assinatura' ? this.urlAssinatura : null
+          urlAssinatura: this.tipoRdo === 'assinatura' ? this.urlAssinatura : null,
+          maxHoraNormalTotal: this.maxHoraNormalTotal,
+          maxHoraNormalExtraTotal: this.maxHoraNormalExtraTotal,
+          maxHoraNormalNoturnaTotal: this.maxHoraNormalNoturnaTotal,
+          maxHoraExtraNoturnaTotal: this.maxHoraExtraNoturnaTotal,
+          maxHoraExtraFdsTotal: this.maxHoraExtraFdsTotal
         }
         if (this.tipoRdo === 'editar' || this.tipoRdo === 'assinatura') {
           console.log(this.tipoRdo, params)
