@@ -224,10 +224,10 @@ export default {
     colaborador: [],
     headers: [
       {
-        text: 'Reg',
+        text: 'Matricula',
         align: 'start',
         sortable: false,
-        value: 'reg'
+        value: 'matricula'
       },
       {
         text: 'Nome',

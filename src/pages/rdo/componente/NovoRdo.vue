@@ -56,6 +56,7 @@
                 <v-container class="py-0">
                   <v-row class="px-5 d-flex justify-center">
                     <v-col
+                      v-if="tipoRdo === 'editar' || tipoRdo === 'assinatura'"
                       cols="12"
                       sm="4"
                       md="4"
@@ -69,6 +70,45 @@
                           label="Data Inicio"
                         >
                       </v-text-field>
+                    </v-col>
+                    <v-col
+                      v-else
+                      cols="12"
+                      sm="4"
+                      md="4"
+                      lg="2"
+                      xs="2"
+                      class="mt-7"
+                    >
+                      <v-menu
+                      ref="menu10"
+                      v-model="menu10"
+                      :close-on-content-click="false"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          v-model="dataRdoInicio"
+                          label="Escolha a Data"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          v-bind="attrs"
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
+                        v-model="dataRdoInicio"
+                        :first-day-of-week="0"
+                        locale="pt-bt"
+                        no-title
+                        scrollable
+                        @input="menu = false"
+                        :max="dateNow"
+                      >
+                      </v-date-picker>
+                    </v-menu>
                     </v-col>
                     <v-col
                       cols="12"
@@ -1645,7 +1685,7 @@ export default {
   mounted () {
     console.log(this.tipoRdo)
     if (this.tipoRdo === 'editar') {
-      this.dataRdoInicio = this.rdoEdit.dataIncioConfig
+      this.dataRdoInicio = moment(this.rdoEdit.rdo.dataInicio).toISOString().substr(0, 10)
       this.nomeCliente = this.rdoEdit.rdo.cliente
       this.nomeProjetos = this.rdoEdit.rdo.projeto
       this.dataIDRDO = this.rdoEdit.rdo.id_rdo
@@ -1702,7 +1742,7 @@ export default {
 
       console.log(this.rdoCopi)
     } else if (this.tipoRdo === 'assinatura') {
-      this.dataRdoInicio = this.rdoAssinatura.dataIncioConfig
+      this.dataRdoInicio = moment(this.rdoAssinatura.rdo.dataInicio).toISOString().substr(0, 10)
       this.nomeCliente = this.rdoAssinatura.rdo.cliente
       this.nomeProjetos = this.rdoAssinatura.rdo.projeto
       this.dataIDRDO = this.rdoAssinatura.rdo.id_rdo
@@ -1734,37 +1774,14 @@ export default {
       console.log(this.rdoAssinatura)
 
       this.assinaturaAws()
-    } else {
-      this.dataRdoInicio = moment(new Date()).locale('pt-br').format('L')
-      this.nomeCliente = ''
-      this.nomeProjetos = ''
-      this.areaAtuacao = ''
-      this.cartaChamada = ''
-      this.nomeFiscal = ''
-      this.nomeEncarregado = ''
-      this.condicaoManha = ''
-      this.condicaoTarde = ''
-      this.condicaoNoite = ''
-      this.prazoAtividade = 0
-      this.diasDecorridos = 0
-      this.prorrogacao = 0
-      this.diasRestantes = 0
-      this.diasDeAtrazos = 0
-      this.opcoesDDS = ''
-      this.opcoesPrejuizo = ''
-      this.opcoesViolacao = ''
-      this.opcoesOciosidade = ''
-      this.servico = ''
-      this.inicioReal = 0
-      this.terminoReal = 0
-      this.inicioPrevisto = 0
-      this.terminoPrevisto = 0
-      this.comentarios = ''
     }
   },
   data: vm => ({
     urlProd: 'https://htgneexsa.cf/api_htg/',
     // urlProd: 'http://localhost:4040/api_htg/',
+    menu10: false,
+    dataRdoInicio: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+    dateNow: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
     dialogoRespostaErro: false,
     dialogoRespostaCorreto: false,
     modalFinalizado: false,
@@ -1772,7 +1789,6 @@ export default {
     projetos: [],
     projetosCliente: [],
     arrayProjetos: [],
-    date: new Date().toISOString().substr(0, 10),
     colaboradores: [],
     arrayFiscal: [],
     arrayColaboradores: [],
@@ -1896,7 +1912,7 @@ export default {
     nomeCliente: '',
     nomeProjetos: '',
     dataIDRDO: moment(new Date()).valueOf(),
-    dataRdoInicio: moment(new Date()).locale('pt-br').format('L'),
+    // dataRdoInicio: moment(new Date()).locale('pt-br').format('L'),
     areaAtuacao: '',
     cartaChamada: '',
     nomeFiscal: '',
@@ -1942,9 +1958,9 @@ export default {
     await this.initializeAtividade()
   },
   computed: {
-    computedDateFormatted () {
+    /* computedDateFormatted () {
       return this.formatDate(this.date)
-    },
+    }, */
 
     formTitle () {
       return this.editedIndex === -1 ? 'Adicionar Colaborador' : 'Editar Colaborador'
@@ -1955,6 +1971,9 @@ export default {
     }
   },
   watch: {
+    /* date (val) {
+      this.dataRdoInicio = this.formatDate(this.date)
+    }, */
     dialog (val) {
       val || this.close()
     },
@@ -1970,18 +1989,18 @@ export default {
     }
   },
   methods: {
-    formatDate (date) {
+    /* formatDate (date) {
       if (!date) return null
 
       const [year, month, day] = date.split('-')
-      return `${month}/${day}/${year}`
+      return `${day}/${month}/${year}`
     },
     parseDate (date) {
       if (!date) return null
 
-      const [month, day, year] = date.split('/')
+      const [day, month, year] = date.split('/')
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-    },
+    }, */
     async getClientes () {
       const result = await axios({
         method: 'GET',
@@ -2007,11 +2026,11 @@ export default {
       // Fiscal
       const fiscal = this.colaboradores.filter(item => { return item.funcao === 'Fiscal' })
       this.arrayFiscal = fiscal.map(x => {
-        return x.reg + ' - ' + x.nome
+        return x.matricula + ' - ' + x.nome
       })
 
       this.arrayColaboradores = this.colaboradores.map(y => {
-        return y.reg + ' - ' + y.nome + ' - ' + y.funcao
+        return y.matricula + ' - ' + y.nome + ' - ' + y.funcao
       })
 
       console.log(this.arrayColaboradores)
@@ -2060,13 +2079,13 @@ export default {
     async salvarRDO (tipo) {
       if (this.nomeCliente && this.nomeProjetos) {
         await this.calculaTotalEfetivo(this.desserts)
-        console.log(new Date(this.dataRdoInicio).valueOf())
         const params = {
           tipo: tipo,
           nomeCliente: this.nomeCliente ? this.nomeCliente : '',
           nomeProjetos: this.nomeProjetos ? this.nomeProjetos : '',
-          dataRdo: this.dataRdoInicio ? this.dataRdoInicio : null,
+          dataRdo: this.dataRdoInicio ? moment(this.dataRdoInicio).locale('pt-br').format('L') : moment(new Date()).locale('pt-br').format('L'),
           diaSemana: this.diaSemana ? this.diaSemana : '',
+          dateInicio: this.dataRdoInicio ? moment(this.dataRdoInicio).valueOf() : moment(new Date()).valueOf(),
           dataIDRDO: this.dataIDRDO ? this.dataIDRDO : moment(new Date()).valueOf(),
           areaAtuacao: this.areaAtuacao ? this.areaAtuacao : '',
           cartaChamada: this.cartaChamada ? this.cartaChamada : '',

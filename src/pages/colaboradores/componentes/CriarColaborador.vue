@@ -134,6 +134,25 @@
                             xs="6"
                             class="pt-5"
                           >
+                            <span>Numero de Matricula</span>
+                            <v-text-field
+                                v-model="numeroMatricula"
+                                :rules="[rules.required]"
+                                type="matricula"
+                                solo
+                                label="Numero de Matricula"
+                                hint="Numero de Matricula"
+                              >
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            md="6"
+                            lg="6"
+                            xs="6"
+                            class="pt-5"
+                          >
                             <span>Email Colaborador</span>
                             <v-text-field
                                 v-model="emailColaborador"
@@ -215,7 +234,7 @@
                       xs="12"
                       class="mt-7 text-right"
                     >
-                    <v-btn @click="tipoColaborador === 'editar' ? editarColaborar() : salvarColaborar()" color="green" class="mr-3 white--text">Salvar</v-btn>
+                    <v-btn @click="tipoColaborador === 'editar' ? editarColaborar() : verificarCampos()" color="green" class="mr-3 white--text">Salvar</v-btn>
                     <v-btn @click="returnColaborador()" color="primary">Voltar</v-btn>
                     </v-col>
                   </v-row>
@@ -253,6 +272,7 @@ export default {
   mounted () {
     console.log(this.tipoColaborador, this.colaboradorEdit)
     if (this.tipoColaborador === 'editar') {
+      console.log(this.tipoColaborador)
       this.reg = this.colaboradorEdit.reg
       this.dataCriacao = this.colaboradorEdit.dataCriacao
       this.nomeColaborador = this.colaboradorEdit.nome
@@ -260,6 +280,7 @@ export default {
       this.telefoneColaborador = this.colaboradorEdit.telefone
       this.cpfColaborador = this.colaboradorEdit.cpf
       this.funcaoColaborador = this.colaboradorEdit.funcao
+      this.numeroMatricula = this.colaboradorEdit.matricula
     }
   },
   data: vm => ({
@@ -276,6 +297,8 @@ export default {
     telefoneColaborador: '',
     cpfColaborador: '',
     funcaoColaborador: '',
+    numeroMatricula: 0,
+    camposVerificados: [],
     rules: {
       required: value => !!value || 'Obrigatório.',
       email: value => {
@@ -308,12 +331,38 @@ export default {
       }
     },
 
+    verificarCampos () {
+      this.camposVerificados = []
+      if (this.nomeColaborador.length < 1) {
+        this.camposVerificados.push('Nome Colaborador')
+      }
+
+      if (this.numeroMatricula.length < 1 || this.numeroMatricula === 0) {
+        this.camposVerificados.push('Numero de Matricula')
+      }
+
+      if (this.emailColaborador.length < 1) {
+        this.camposVerificados.push('Email Colaborador')
+      }
+
+      if (this.cpfColaborador.length < 1) {
+        this.camposVerificados.push('CPF Colaborador')
+      }
+
+      if (this.funcaoColaborador.length < 1) {
+        this.camposVerificados.push('Função Colaborador')
+      }
+
+      this.salvarColaborar()
+    },
+
     async salvarColaborar () {
-      if (this.nomeColaborador && this.emailColaborador) {
+      if (this.camposVerificados.length === 0) {
         const params = {
           reg: this.reg,
           dataCriacao: this.dataCriacao,
           nomeColaborador: this.nomeColaborador,
+          matricula: this.numeroMatricula * 1,
           emailColaborador: this.emailColaborador ? this.emailColaborador : '',
           telefoneColaborador: this.telefoneColaborador ? this.telefoneColaborador : 0,
           cpfColaborador: this.cpfColaborador ? this.cpfColaborador : 0,
@@ -344,16 +393,8 @@ export default {
         }
         console.log(params)
       } else {
-        const invalidos = []
-        if (this.nomeColaborador.length < 1) {
-          invalidos.push('Nome')
-        }
-        if (this.emailColaborador.length < 1) {
-          invalidos.push('Email')
-        }
-        console.log(invalidos)
         this.snackbar = true
-        this.mensagem = 'Preencher o(s) campo(s): ' + invalidos.join(', ')
+        this.mensagem = 'Preencher o(s) campo(s): ' + this.camposVerificados.join(', ')
         this.colorSnackbar = 'red'
       }
     },
@@ -363,6 +404,7 @@ export default {
         reg: this.reg,
         dataCriacao: this.dataCriacao,
         nomeColaborador: this.nomeColaborador,
+        matricula: this.numeroMatricula * 1,
         emailColaborador: this.emailColaborador ? this.emailColaborador : '',
         telefoneColaborador: this.telefoneColaborador ? this.telefoneColaborador : 0,
         cpfColaborador: this.cpfColaborador ? this.cpfColaborador : 0,

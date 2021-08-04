@@ -211,10 +211,10 @@ export default {
     switchColaborador: true,
     headers: [
       {
-        text: 'Reg',
+        text: 'Matricula',
         align: 'start',
         sortable: false,
-        value: 'reg'
+        value: 'matricula'
       },
       {
         text: 'Nome',
@@ -277,6 +277,7 @@ export default {
     newColaborador () {
       this.showColaboradores = false
       this.showCriarColaborador = true
+      this.tipoColaborador = 'criar'
     },
     editarColaborador (item) {
       this.colaboradorEdit = item

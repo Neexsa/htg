@@ -439,6 +439,7 @@ export default {
     newRdo () {
       this.showRdo = false
       this.showNovoRdo = true
+      this.tipoRdo = 'criar'
     },
 
     voltarRDO () {
