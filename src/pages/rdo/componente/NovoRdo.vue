@@ -106,6 +106,7 @@
                         scrollable
                         @input="menu = false"
                         :max="dateNow"
+                        @change="ajusteInformacoes()"
                       >
                       </v-date-picker>
                     </v-menu>
@@ -219,7 +220,7 @@
                               solo
 
                               :disabled="nomeCliente ? false : true"
-                              @change="buscarSeguencial()"
+                              @change="buscarInfoProjeto()"
                             ></v-autocomplete>
                             <v-text-field
                               v-if="tipoRdo === 'editar' || tipoRdo === 'assinatura'"
@@ -321,7 +322,7 @@
                               label="Prazo Da Atividade"
                               solo
                               class="pt-2"
-                              :disabled="tipoRdo === 'assinatura' ? true : false"
+                              disabled
                             >
                             </v-text-field>
                           </v-col>
@@ -339,7 +340,7 @@
                               label="Dias Decorridos"
                               solo
                               class="pt-2"
-                              :disabled="tipoRdo === 'assinatura' ? true : false"
+                              disabled
                             >
                             </v-text-field>
                           </v-col>
@@ -357,7 +358,7 @@
                               label="Prorrogação"
                               solo
                               class="pt-2"
-                              :disabled="tipoRdo === 'assinatura' ? true : false"
+                              disabled
                             >
                             </v-text-field>
                           </v-col>
@@ -375,7 +376,7 @@
                               label="Dias Restantes"
                               solo
                               class="pt-2"
-                              :disabled="tipoRdo === 'assinatura' ? true : false"
+                              disabled
                             >
                             </v-text-field>
                           </v-col>
@@ -393,7 +394,7 @@
                               label="Dias De Atrazo"
                               solo
                               class="pt-2"
-                              :disabled="tipoRdo === 'assinatura' ? true : false"
+                              disabled
                             >
                             </v-text-field>
                           </v-col>
@@ -1947,7 +1948,9 @@ export default {
     maxHoraNormalExtraTotal: 0,
     maxHoraNormalNoturnaTotal: 0,
     maxHoraExtraNoturnaTotal: 0,
-    maxHoraExtraFdsTotal: 0
+    maxHoraExtraFdsTotal: 0,
+    dataInicioProjeto: 0,
+    dataFimProjeto: 0
   }),
   async created () {
     await this.getClientes()
@@ -2036,17 +2039,52 @@ export default {
       console.log(this.arrayColaboradores)
     },
 
-    async buscarSeguencial () {
+    async buscarInfoProjeto () {
       const params = {
         nomeCliente: this.nomeCliente ? this.nomeCliente : '',
         nomeProjetos: this.nomeProjetos ? this.nomeProjetos : ''
       }
       const result = await axios({
         method: 'POST',
-        url: `${this.urlProd}get-seguencia-rdo`,
+        url: `${this.urlProd}get-info-rdo`,
         data: params
       })
+      console.log(result.data)
       this.seguencia = result.data.numSeguencia
+      this.dataInicioProjeto = result.data.dataInicio
+      this.dataFimProjeto = result.data.dataFim
+      this.prorrogacao = result.data.prorrogacao
+
+      this.ajusteInformacoes()
+    },
+
+    ajusteInformacoes () {
+      const dataAgora = moment(new Date(this.dataRdoInicio)).valueOf()
+      // eslint-disable-next-line quote-props
+      const momentAgora = moment(this.dataInicioProjeto).set({ 'hour': 0, 'minute': 0, 'seconds': 0 }).valueOf()
+      // eslint-disable-next-line quote-props
+      const momentDepois = moment(this.dataFimProjeto).set({ 'hour': 23, 'minute': 59, 'seconds': 59 }).valueOf()
+      console.log(momentAgora, momentDepois)
+      const tempoProrrogacao = this.prorrogacao * 1000 * 3600 * 24
+      const momentProrrogacao = this.prorrogacao ? momentDepois + tempoProrrogacao : momentDepois
+
+      // Prazo atividade
+      this.prazoAtividade = this.calculaInformacoes(momentAgora, momentProrrogacao)
+
+      // Dias Decorridos
+      this.diasDecorridos = this.calculaInformacoes(momentAgora, dataAgora)
+
+      // Dias Restantes
+      this.diasRestantes = this.calculaInformacoes(dataAgora, momentProrrogacao)
+
+      // Dias Atrazo
+      this.diasDeAtrazos = this.calculaInformacoes(momentProrrogacao, dataAgora)
+    },
+
+    calculaInformacoes (dateAntes, dateDepois) {
+      var timeDiff = Math.abs(dateAntes - dateDepois)
+      var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
+      return diffDays
     },
 
     diaDaSemana () {

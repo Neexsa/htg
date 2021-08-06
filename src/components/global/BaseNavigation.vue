@@ -157,8 +157,8 @@ export default {
             { title: 'Clientes', link: 'Clientes', icon: 'mdi-factory' },
             { title: 'Projetos', link: 'Projetos', icon: 'mdi-folder-plus' },
             { title: 'RDO', link: 'RDO', icon: 'mdi-file-plus' },
-            { title: 'Assinatura RDO', link: 'Assinatura', icon: 'mdi-pencil' }
-            // { title: 'Dashboard', icon: 'mdi-file-plus' }
+            { title: 'Assinatura RDO', link: 'Assinatura', icon: 'mdi-pencil' },
+            { title: 'Dashboard', link: 'DashRdo', icon: 'mdi-chart-pie' }
           ]
         }
       ]

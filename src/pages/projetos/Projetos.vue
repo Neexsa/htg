@@ -1,6 +1,6 @@
 <template>
   <div class="projetos">
-      <v-container>
+      <v-container v-if="showProjetos">
         <v-layout row wrap>
           <v-flex sm12 xs12 md12 lg12 class="mt-10">
               <v-card-title class="align-start">
@@ -119,7 +119,6 @@
                             :items="clientes"
                             label="Cliente"
                             clearable
-                            @change="getFiltroProjeto(nomeCliente)"
                           ></v-autocomplete>
                       </v-col>
                       <v-col
@@ -140,7 +139,7 @@
                         xs="3"
                         style="text-align:right"
                       >
-                          <v-btn color="blue" class="white--text" @click="dialogCliente = true">Adicionar Projeto</v-btn>
+                          <v-btn color="blue" class="white--text" @click="newProjeto()">Adicionar Projeto</v-btn>
                       </v-col>
                       </template>
                     </v-row>
@@ -181,6 +180,19 @@
                             :items-per-page="5"
                             class="elevation-1 color-table"
                           >
+                          <template v-slot:[`item.editar`]="{ item }">
+                            <v-btn
+                              width="30px"
+                              height="30px"
+                              fab
+                              dark
+                              small
+                              color="primary"
+                              @click="editarProjeto(item)"
+                            >
+                              <v-icon dark small>mdi-pencil</v-icon>
+                            </v-btn>
+                          </template>
                           <template v-slot:[`item.pausado`]="{ item }">
                             <v-btn
                               width="30px"
@@ -204,101 +216,13 @@
           </v-flex>
         </v-layout>
       </v-container>
-      <v-dialog
-        v-model="dialogCliente"
-        transition="dialog-top-transition"
-        max-width="600"
-      >
-        <template>
-          <v-card>
-            <v-toolbar
-              color="primary"
-              dark
-            >Adicionar Cliente</v-toolbar>
-            <v-card-text>
-              <v-form
-                ref="form"
-              >
-                  <v-container fluid>
-                  <v-row>
-                    <v-col
-                        cols="12"
-                        sm="4"
-                        md="4"
-                        lg="12"
-                        xs="12"
-                        >
-                          <v-autocomplete
-                            v-model="nomeClienteAdicionar"
-                            :items="clientes"
-                            label="Cliente"
-                            clearable
-                            @change="getFiltroProjeto(nomeCliente)"
-                          ></v-autocomplete>
-                      </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                    >
-                    <v-text-field
-                      v-model="novoNomeProjeto"
-                      :rules="rules.name"
-                      label="Nome do Projeto"
-                      required
-                      clearable
-                    ></v-text-field>
-                    </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                    >
-                      <v-menu
-                          ref="menuModal"
-                          v-model="menuModal"
-                          :close-on-content-click="false"
-                          transition="scale-transition"
-                          offset-y
-                          min-width="auto"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              v-model="dateModal"
-                              label="Escolha a Data"
-                              prepend-icon="mdi-calendar"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker
-                            v-model="dateModal"
-                            :first-day-of-week="0"
-                            locale="pt-bt"
-                            no-title
-                            scrollable
-                            @input="menuModal = false"
-                          >
-                          </v-date-picker>
-                        </v-menu>
-                    </v-col>
-                  </v-row>
-                  </v-container>
-              </v-form>
-            </v-card-text>
-            <v-card-actions class="justify-end">
-              <v-btn
-                text
-                @click="dialogCliente = false"
-              >Close</v-btn>
-              <v-btn
-                color="green"
-                text
-                @click="verificarFormulario()"
-              >Salvar</v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </v-dialog>
+
+      <novo-projeto
+        v-if="showCriarProjeto"
+        v-on:voltar="voltarProjeto()"
+        :tipoProjeto="tipoProjeto"
+        :projetoEdit="projetoEdit"
+      />
 
       <v-snackbar
         v-model="snackbar"
@@ -324,13 +248,15 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import NovoProjeto from './componente/NovoProjeto.vue'
 export default {
+  components: { NovoProjeto },
   data: vm => ({
+    urlProd: 'https://htgneexsa.cf/api_htg/',
+    // urlProd: 'http://localhost:4040/api_htg/',
     date: '',
-    dateModal: new Date().toISOString().substr(0, 10),
     dateFormatted: '',
     menu: false,
-    menuModal: false,
     switchProjetos: false,
     resultArray: [],
     projetos: [],
@@ -338,8 +264,14 @@ export default {
     clientes: [],
     headers: [
       {
-        text: 'Nome dos Projetos',
+        text: 'ID',
         align: 'start',
+        sortable: false,
+        value: 'idProjeto'
+      },
+      {
+        text: 'Nome dos Projetos',
+        align: 'center',
         sortable: false,
         value: 'nome'
       },
@@ -354,8 +286,18 @@ export default {
         align: 'center'
       },
       {
+        text: 'Data Fim',
+        value: 'dataFimConfig',
+        align: 'center'
+      },
+      {
         text: 'Status',
         value: 'status',
+        align: 'center'
+      },
+      {
+        text: 'Editar',
+        value: 'editar',
         align: 'center'
       },
       {
@@ -366,16 +308,16 @@ export default {
     ],
     dataInicio: '',
     showRdoProjeto: false,
-    dialogCliente: false,
     mensagem: '',
     colorSnackbar: '',
     novoNomeProjeto: '',
     snackbar: false,
     textoPesquisar: '',
-    nomeClienteAdicionar: '',
     nomeCliente: '',
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    showProjetos: true,
+    showCriarProjeto: false,
+    tipoProjeto: '',
+    projetoEdit: [],
     rules: {
       name: [val => (val || '').length > 0 || 'Preencher o Nome do Cliente']
     }
@@ -431,10 +373,12 @@ export default {
           url: `${this.urlProd}projetos`,
           data: params
         })
+        console.log(result.data)
         this.resultArray = result.data.map(item => {
           return {
             ...item,
             dataIncioConfig: moment(item.dataInicioInter).format('DD/MM/YYYY'),
+            dataFimConfig: moment(item.dataFimInter).format('DD/MM/YYYY'),
             status: item.ativo ? 'Ativo' : 'Desativo'
           }
         })
@@ -444,32 +388,6 @@ export default {
         console.log(err)
         this.snackbar = true
         this.mensagem = 'Erro ao carregar Projetos'
-        this.colorSnackbar = 'red'
-      }
-    },
-
-    async verificarFormulario () {
-      const dataInicio = moment(this.dateModal).valueOf()
-      console.log(this.novoNomeProjeto, dataInicio)
-      if (this.novoNomeProjeto && dataInicio && this.nomeClienteAdicionar) {
-        const params = {
-          nomeCliente: this.nomeClienteAdicionar,
-          novoNomeProjeto: this.novoNomeProjeto,
-          dataInicio: dataInicio
-        }
-        const result = await axios({
-          method: 'POST',
-          url: `${this.urlProd}novo-projeto`,
-          data: params
-        })
-        this.snackbar = true
-        this.mensagem = result.data.mensagem
-        this.colorSnackbar = 'green'
-        this.dialogCliente = false
-        this.getProjetos()
-      } else {
-        this.snackbar = true
-        this.mensagem = 'Preencha os Campos!!!'
         this.colorSnackbar = 'red'
       }
     },
@@ -492,7 +410,6 @@ export default {
           this.snackbar = true
           this.mensagem = result.data.mensagem + ': ' + result.data.cliente
           this.colorSnackbar = 'red'
-          this.dialogCliente = false
         } else {
           this.snackbar = true
           this.mensagem = result.data.mensagem
@@ -510,6 +427,25 @@ export default {
     mudarStatus () {
       const switarray = this.resultArray
       this.desserts = switarray.filter(item => { return item.pausado === this.switchProjetos })
+    },
+
+    voltarProjeto () {
+      this.showProjetos = true
+      this.showCriarProjeto = false
+      this.getProjetos()
+    },
+
+    newProjeto () {
+      this.showProjetos = false
+      this.showCriarProjeto = true
+      this.tipoProjeto = 'criar'
+    },
+
+    editarProjeto (item) {
+      this.showProjetos = false
+      this.showCriarProjeto = true
+      this.tipoProjeto = 'editar'
+      this.projetoEdit = item
     }
   }
 }
