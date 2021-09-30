@@ -494,7 +494,9 @@ export default {
       this.modalColaboradores = true
       this.arrayEfetivo = []
       const cargos = item.map(x => { return x.funcaoEfetivo })
-      cargos.forEach(element => {
+      const cargosUnique = [...new Set(cargos)]
+      console.log('cargos', cargosUnique)
+      cargosUnique.forEach(element => {
         let filterItem = []
         filterItem = item.filter(y => { return y.funcaoEfetivo === element })
         const cargosEfet = {

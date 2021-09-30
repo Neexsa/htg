@@ -388,10 +388,10 @@
                             lg="2"
                             xs="2"
                           >
-                            <span>Dias De Atrazo</span>
+                            <span>Dias De Atraso</span>
                             <v-text-field
                               v-model="diasDeAtrazos"
-                              label="Dias De Atrazo"
+                              label="Dias De Atraso"
                               solo
                               class="pt-2"
                               disabled
@@ -516,6 +516,7 @@
                               persistent-hint
                               clearable
                               solo
+                              multiple
                             ></v-autocomplete>
                           </v-col>
                           <v-col
@@ -562,7 +563,7 @@
                                     Horario Normal
                                   </th>
                                   <th class="text-center">
-                                    Hora Extra Sag/Sáb
+                                    Hora Extra Seg/Sexta
                                   </th>
                                   <th class="text-center">
                                     Horario Normal Noturna
@@ -571,7 +572,7 @@
                                     Horario Extra Noturna
                                   </th>
                                   <th class="text-center">
-                                    Horario Extra Dom/Feri
+                                    Horario Extra FDS/Feri
                                   </th>
                                   <th class="text-center" v-if="tipoRdo !== 'assinatura'">
                                     Adicionar Horas
@@ -832,12 +833,22 @@
                             xs="4"
                           >
                             <span class="pl-2">Serviço: </span>
+                            <v-autocomplete
+                              v-if="tipoRdo !== 'assinatura'"
+                              class="pt-2"
+                              v-model="servico"
+                              :items="atividadesProjeto"
+                              label="Serviço"
+                              clearable
+                              solo
+                            ></v-autocomplete>
                             <v-text-field
+                              v-else
                               v-model="servico"
                               label="Serviço"
                               class="pt-2"
                               solo
-                              :disabled="tipoRdo === 'assinatura' ? true : false"
+                              disabled
                             ></v-text-field>
                           </v-col>
                           <v-col
@@ -1013,186 +1024,93 @@
                             md="12"
                             lg="12"
                             xs="12"
-                            class="text-center"
+                            class="text-end"
                           >
-                          <v-data-table
-                            :headers="headersAtividade"
-                            :items="dessertsAtividade"
-                            sort-by="horaNormalInicio"
-                            class="elevation-1"
+                          <v-btn
+                            color="primary"
+                            @click="setAtividades()"
+                            v-if="tipoRdo !== 'assinatura'"
                           >
-                            <template v-slot:top>
-                              <v-toolbar
-                                flat
-                              >
-                                <v-toolbar-title>Mão de obra direta</v-toolbar-title>
-                                <v-divider
-                                  class="mx-4"
-                                  inset
-                                  vertical
-                                ></v-divider>
-                                <v-spacer></v-spacer>
-                                <v-dialog
-                                  v-model="dialogAtividade"
-                                  max-width="700px"
-                                >
-                                  <template v-slot:activator="{ on, attrs }">
-                                    <v-btn
-                                      color="primary"
-                                      dark
-                                      class="mb-2"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      @click="changeId()"
-                                      v-if="tipoRdo !== 'assinatura'"
-                                    >
-                                      Adicionar Atividade
-                                    </v-btn>
-                                  </template>
-                                  <v-card>
-                                    <v-card-title>
-                                      <span class="headline">{{ formTitleAtividade }}</span>
-                                    </v-card-title>
-
-                                    <v-card-text>
-                                      <v-container>
-                                        <v-row>
-                                          <v-col
-                                            cols="12"
-                                            sm="10"
-                                            md="10"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.descricao"
-                                              label="DESCRIÇÃO DO SERVIÇO"
-                                              clearable
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="2"
-                                            md="2"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.id "
-                                              label="Id"
-                                              readonly
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="4"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.quantCont"
-                                              label="QUANT. CONT."
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="4"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.realAcum"
-                                              label="REAL ACUM."
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="4"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.quantReal"
-                                              label="QUANT. REAL"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.saldoCont"
-                                              label="SALDO QUANT."
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.unidade"
-                                              label="Unidade"
-                                            ></v-text-field>
-                                          </v-col>
-                                          <v-col
-                                            cols="12"
-                                            sm="6"
-                                            md="4"
-                                          >
-                                            <v-text-field
-                                              v-model="editedItemAtividade.referencia"
-                                              label="Referência"
-                                            ></v-text-field>
-                                          </v-col>
-                                        </v-row>
-                                      </v-container>
-                                    </v-card-text>
-
-                                    <v-card-actions v-if="tipoRdo !== 'assinatura'">
-                                      <v-spacer></v-spacer>
-                                      <v-btn
-                                        color="blue darken-1"
-                                        text
-                                        @click="closeAtividade"
-                                      >
-                                        Cancel
-                                      </v-btn>
-                                      <v-btn
-                                        color="green darken-1"
-                                        text
-                                        @click="saveAtividade"
-                                      >
-                                        Salvar
-                                      </v-btn>
-                                    </v-card-actions>
-                                  </v-card>
-                                </v-dialog>
-                                <v-dialog v-model="dialogDeleteAtividade" max-width="500px">
-                                  <v-card>
-                                    <v-card-title class="headline">Tem certeza que vai excluir?</v-card-title>
-                                    <v-card-actions>
-                                      <v-spacer></v-spacer>
-                                      <v-btn color="blue darken-1" text @click="closeDeleteAtividade">Cancel</v-btn>
-                                      <v-btn color="blue darken-1" text @click="deleteItemConfirmAtividade">OK</v-btn>
-                                      <v-spacer></v-spacer>
-                                    </v-card-actions>
-                                  </v-card>
-                                </v-dialog>
-                              </v-toolbar>
-                            </template>
-                            <template v-slot:[`item.actions`]="{ item }" v-if="tipoRdo !== 'assinatura'">
-                              <v-icon
-                                small
-                                class="mr-2"
-                                @click="editItemAtividade(item)"
-                              >
-                                mdi-pencil
-                              </v-icon>
-                              <v-icon
-                                small
-                                @click="deleteItemAtividade(item)"
-                              >
-                                mdi-delete
-                              </v-icon>
-                            </template>
-                          </v-data-table>
+                            Atualizar
+                          </v-btn>
                           </v-col>
                         </v-row>
+
+                        <v-row class="px-5">
+                          <v-col
+                            cols="12"
+                            sm="12"
+                            md="12"
+                            lg="12"
+                            xs="12"
+                            class="text-center"
+                          >
+                          <v-simple-table>
+                            <template v-slot:default>
+                              <thead>
+                                <tr>
+                                  <th class="text-left">
+                                    ID
+                                  </th>
+                                  <th class="text-center">
+                                    Descrição do Serviço
+                                  </th>
+                                  <th class="text-center">
+                                    QUANT. CONT.
+                                  </th>
+                                  <th class="text-center">
+                                    REAL ACUM.
+                                  </th>
+                                  <th class="text-center">
+                                    QUANT. REAL
+                                  </th>
+                                  <th class="text-center">
+                                    SALDO QUANT
+                                  </th>
+                                  <th class="text-center">
+                                    UNIDADE
+                                  </th>
+                                  <th class="text-center">
+                                    REFERENCIA
+                                  </th>
+                                  <th class="text-center">
+                                    Editar
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr
+                                  v-for="item in dessertsAtividade"
+                                  :key="item.id"
+                                >
+                                  <td>{{ item.id }}</td>
+                                  <td>{{ item.descricao }}</td>
+                                  <td>{{ item.quantCont }}</td>
+                                  <td>{{ item.realAcum }}</td>
+                                  <td>{{ item.quantReal }}</td>
+                                  <td>{{ item.saldoCont }}</td>
+                                  <td>{{ item.unidade }}</td>
+                                  <td>{{ item.referencia }}</td>
+                                  <td v-if="tipoRdo !== 'assinatura'">
+                                    <v-btn
+                                      fab
+                                      dark
+                                      x-small
+                                      color="primary"
+                                      @click="adicionarReferencia(item)"
+                                    >
+                                      <v-icon dark>
+                                        mdi-plus
+                                      </v-icon>
+                                    </v-btn>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </template>
+                          </v-simple-table>
+                          </v-col>
+                        </v-row>
+
                       </v-card>
                     </v-col>
                   </v-row>
@@ -1359,7 +1277,7 @@
         </v-layout>
       </v-container>
 
-      <v-dialog
+      <!-- <v-dialog
         v-model="dialogHoraEfetivo"
         transition="dialog-top-transition"
         max-width="600"
@@ -1593,6 +1511,226 @@
             </v-card-actions>
           </v-card>
         </template>
+      </v-dialog> -->
+
+      <v-dialog
+        v-model="dialogHoraEfetivo"
+        transition="dialog-top-transition"
+        max-width="600"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >Adicionar Hora Efetivo</v-toolbar>
+            <v-card-text>
+              <v-form
+                ref="form"
+                class="py-0"
+              >
+                <v-container fluid class="py-0">
+                  <v-row class="pt-5 d-flex justify-center">
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                    >
+                      <v-text-field
+                        class="text-center"
+                        v-model="diaSemana"
+                        label="Dia da Semana"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row class="py-0">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="6"
+                      class="py-0"
+                    >
+                      <v-checkbox
+                        v-model="normalHorario"
+                        label="Horário Normal"
+                      ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                  <v-row class="py-0" v-if="normalHorario">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="horaInicioNovo"
+                        label="Início"
+                        @change="horaNovo()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="horaFimNovo"
+                        label="Termino"
+                        @change="horaNovo()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="horaTotalNovo"
+                        label="Total"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-divider></v-divider>
+                  <v-row class="pt-5">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="6"
+                      class="py-0"
+                    >
+                    <v-checkbox
+                      v-model="extraHorario"
+                      label="Horário Extra"
+                    ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                  <v-row class="py-0" v-if="extraHorario">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="horaExtraInicioNovo"
+                        label="Início"
+                        @change="horaExtraNovo()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="horaExtraFimNovo"
+                        label="Termino"
+                        @change="horaExtraNovo()"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="horaExtraTotalNovo"
+                        label="Total"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                    <v-divider></v-divider>
+                  <v-row class="pt-5">
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="6"
+                      class="py-0"
+                    >
+                    <v-checkbox
+                      v-model="noturnoHorario"
+                      label="Noturno"
+                    ></v-checkbox>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="6"
+                      class="py-0"
+                    >
+                    <v-checkbox
+                      v-model="feriadoHorario"
+                      label="Feriado"
+                    ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="dialogHoraEfetivo = false"
+              >Close</v-btn>
+              <v-btn
+                color="green"
+                text
+                @click="salvarHorarioNovo()"
+              >Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+
+      <v-dialog
+        v-model="modalAtividade"
+        transition="dialog-top-transition"
+        max-width="600"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >Adicionar Referencia</v-toolbar>
+            <v-card-text>
+              <v-form
+                ref="form"
+                class="py-0"
+              >
+                <v-container fluid class="py-0">
+                  <v-row class="pt-5 d-flex justify-center">
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                    >
+                      <v-text-field
+                        class="text-center"
+                        v-model="paramsAtividades.referencia"
+                        label="Referencia"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="modalAtividade = false"
+              >Close</v-btn>
+              <v-btn
+                color="green"
+                text
+                @click="salvarReferencia()"
+              >Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
       </v-dialog>
 
       <v-dialog
@@ -1778,8 +1916,8 @@ export default {
     }
   },
   data: vm => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     menu10: false,
     dataRdoInicio: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
     dateNow: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -1820,10 +1958,10 @@ export default {
       { text: 'Nome', value: 'nomeEfetivo', align: 'center', sortable: true },
       { text: 'Funcao', value: 'funcaoEfetivo', align: 'center', sortable: true },
       { text: 'Horario Normal', value: 'horaNormalTotal', align: 'center', sortable: true },
-      { text: 'Hora Extra Sag/Sáb', value: 'horaNormalExtraTotal', align: 'center', sortable: true },
+      { text: 'Hora Extra Seg/Sexta', value: 'horaNormalExtraTotal', align: 'center', sortable: true },
       { text: 'Horario Normal Noturna', value: 'horaNormalNoturnaTotal', align: 'center', sortable: true },
       { text: 'Horario Extra Noturna', value: 'horaExtraNoturnaTotal', align: 'center', sortable: true },
-      { text: 'Horario Extra Dom/Feri', value: 'horaExtraFdsTotal', align: 'center', sortable: true },
+      { text: 'Horario Extra Sab/Dom/Feri', value: 'horaExtraFdsTotal', align: 'center', sortable: true },
       { text: 'Actions', value: 'actions', sortable: false }
     ],
     headersAtividade: [
@@ -1937,6 +2075,9 @@ export default {
     terminoPrevisto: 0,
     comentarios: '',
 
+    atividadesProjeto: [],
+    atividades: [],
+
     efetivosArray: '',
     dialogHoraEfetivo: false,
     dialogDeleteEfetivo: false,
@@ -1950,15 +2091,36 @@ export default {
     maxHoraExtraNoturnaTotal: 0,
     maxHoraExtraFdsTotal: 0,
     dataInicioProjeto: 0,
-    dataFimProjeto: 0
+    dataFimProjeto: 0,
+
+    paramHoraNormalTotal: 0,
+
+    horaInicioNovo: 0,
+    horaFimNovo: 0,
+    horaTotalNovo: 0,
+    horaExtraInicioNovo: 0,
+    horaExtraFimNovo: 0,
+    horaExtraTotalNovo: 0,
+    normalHorario: true,
+    extraHorario: false,
+    noturnoHorario: false,
+    feriadoHorario: false,
+
+    modalAtividade: false,
+    paramsAtividades: [],
+    editedIndexReferencia: 0
   }),
   async created () {
     await this.getClientes()
     await this.getProjetos()
     await this.getColaboradores()
-    await this.diaDaSemana()
     await this.initialize()
     await this.initializeAtividade()
+    await this.diaDaSemana()
+
+    if (this.tipoRdo === 'editar') {
+      await this.buscarInfoProjeto()
+    }
   },
   computed: {
     /* computedDateFormatted () {
@@ -2054,17 +2216,21 @@ export default {
       this.dataInicioProjeto = result.data.dataInicio
       this.dataFimProjeto = result.data.dataFim
       this.prorrogacao = result.data.prorrogacao
+      this.atividadesProjeto = result.data.atividadesProjeto.map(x => {
+        return this.nomeProjetos + ' - ' + x
+      })
+      this.atividades = result.data.atividades
 
       this.ajusteInformacoes()
     },
 
-    ajusteInformacoes () {
-      const dataAgora = moment(new Date(this.dataRdoInicio)).valueOf()
+    async ajusteInformacoes () {
+      const dataAgora = moment(new Date(this.dataRdoInicio)).valueOf() + (1000 * 3600 * 24)
+      await this.diaDaSemana()
       // eslint-disable-next-line quote-props
       const momentAgora = moment(this.dataInicioProjeto).set({ 'hour': 0, 'minute': 0, 'seconds': 0 }).valueOf()
       // eslint-disable-next-line quote-props
       const momentDepois = moment(this.dataFimProjeto).set({ 'hour': 23, 'minute': 59, 'seconds': 59 }).valueOf()
-      console.log(momentAgora, momentDepois)
       const tempoProrrogacao = this.prorrogacao * 1000 * 3600 * 24
       const momentProrrogacao = this.prorrogacao ? momentDepois + tempoProrrogacao : momentDepois
 
@@ -2074,11 +2240,19 @@ export default {
       // Dias Decorridos
       this.diasDecorridos = this.calculaInformacoes(momentAgora, dataAgora)
 
-      // Dias Restantes
-      this.diasRestantes = this.calculaInformacoes(dataAgora, momentProrrogacao)
+      if (momentDepois > dataAgora) {
+        // Dias Restantes
+        this.diasRestantes = this.calculaInformacoes(dataAgora, momentProrrogacao)
+      } else {
+        this.diasRestantes = 0
+      }
 
-      // Dias Atrazo
-      this.diasDeAtrazos = this.calculaInformacoes(momentProrrogacao, dataAgora)
+      if (momentDepois > dataAgora) {
+        this.diasDeAtrazos = 0
+      } else {
+        // Dias Atrazo
+        this.diasDeAtrazos = this.calculaInformacoes(momentProrrogacao, dataAgora)
+      }
     },
 
     calculaInformacoes (dateAntes, dateDepois) {
@@ -2089,7 +2263,12 @@ export default {
 
     diaDaSemana () {
       const semana = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado']
-      const d = new Date()
+      /* const d = new Date()
+      this.diaSemana = semana[d.getDay()]
+      console.log(this.diaSemana) */
+      const dataAgora = moment(new Date(this.dataRdoInicio)).valueOf() + (1000 * 3600 * 24)
+      const d = new Date(dataAgora)
+      console.log(d)
       this.diaSemana = semana[d.getDay()]
       console.log(this.diaSemana)
     },
@@ -2117,6 +2296,7 @@ export default {
     async salvarRDO (tipo) {
       if (this.nomeCliente && this.nomeProjetos) {
         await this.calculaTotalEfetivo(this.desserts)
+        console.log('nomeFiscal', this.nomeFiscal)
         const params = {
           tipo: tipo,
           nomeCliente: this.nomeCliente ? this.nomeCliente : '',
@@ -2333,7 +2513,7 @@ export default {
       this.closeAtividade()
     },
 
-    horaNormal () {
+    /* horaNormal () {
       this.editedItem.horaNormalInicio = this.editedItem.horaNormalInicio * 1
       this.editedItem.horaNormalTermino = this.editedItem.horaNormalTermino * 1
       this.editedItem.horaNormalTotal = this.editedItem.horaNormalTermino - this.editedItem.horaNormalInicio
@@ -2361,7 +2541,7 @@ export default {
       this.editedItem.horaExtraFdsInicio = this.editedItem.horaExtraFdsInicio * 1
       this.editedItem.horaExtraFdsTermino = this.editedItem.horaExtraFdsTermino * 1
       this.editedItem.horaExtraFdsTotal = this.editedItem.horaExtraFdsTermino - this.editedItem.horaExtraFdsInicio
-    },
+    }, */
 
     changeId () {
       this.editedItemAtividade.id = this.dessertsAtividade.length + 1
@@ -2374,42 +2554,48 @@ export default {
     },
 
     adiconarColaboradores () {
-      const splitElement = this.efetivosArray.split('-')
-      console.log(splitElement)
+      console.log(this.efetivosArray)
+      this.efetivosArray.forEach(element => {
+        const splitElement = element.split('-')
+        console.log(splitElement)
 
-      const idVerif = splitElement[0] * 1
-      const verificarColab = this.desserts.filter(item => { return item.idEfetivo === idVerif })
+        const idVerif = splitElement[0] * 1
+        console.log(this.desserts)
+        const verificarColab = this.desserts.filter(item => { return item.idEfetivo === idVerif })
 
-      console.log('verificar', verificarColab.length)
+        console.log('verificar', verificarColab.length)
 
-      if (verificarColab.length > 0) {
-        this.snackbar = true
-        this.mensagem = 'Colaborador ja esta adicionado'
-        this.colorSnackbar = 'red'
-      } else {
-        const obj = {
-          name: this.efetivosArray,
-          idEfetivo: splitElement[0] * 1,
-          nomeEfetivo: splitElement[1].trim(),
-          funcaoEfetivo: splitElement[2].trim(),
-          horaNormalInicio: 0,
-          horaNormalTermino: 0,
-          horaNormalTotal: 0,
-          horaNormalExtraInicio: 0,
-          horaNormalExtraTermino: 0,
-          horaNormalExtraTotal: 0,
-          horaNormalNoturnaInicio: 0,
-          horaNormalNoturnaTermino: 0,
-          horaNormalNoturnaTotal: 0,
-          horaExtraNoturnaInicio: 0,
-          horaExtraNoturnaTermino: 0,
-          horaExtraNoturnaTotal: 0,
-          horaExtraFdsInicio: 0,
-          horaExtraFdsTermino: 0,
-          horaExtraFdsTotal: 0
+        if (verificarColab.length > 0) {
+          this.snackbar = true
+          this.mensagem = 'Colaborador ja esta adicionado'
+          this.colorSnackbar = 'red'
+        } else {
+          const obj = {
+            name: this.efetivosArray,
+            idEfetivo: splitElement[0] * 1,
+            nomeEfetivo: splitElement[1].trim(),
+            funcaoEfetivo: splitElement[2].trim(),
+            horaNormalInicio: 0,
+            horaNormalTermino: 0,
+            horaNormalTotal: 0,
+            horaNormalExtraInicio: 0,
+            horaNormalExtraTermino: 0,
+            horaNormalExtraTotal: 0,
+            horaNormalNoturnaInicio: 0,
+            horaNormalNoturnaTermino: 0,
+            horaNormalNoturnaTotal: 0,
+            horaExtraNoturnaInicio: 0,
+            horaExtraNoturnaTermino: 0,
+            horaExtraNoturnaTotal: 0,
+            horaExtraFdsInicio: 0,
+            horaExtraFdsTermino: 0,
+            horaExtraFdsTotal: 0
+          }
+          this.desserts.push(obj)
         }
-        this.desserts.push(obj)
-      }
+      })
+
+      this.efetivosArray = []
     },
 
     adicionarHoras (item) {
@@ -2484,6 +2670,217 @@ export default {
 
     async verificarAssinatura () {
       this.salvarRDO('assinar')
+    },
+
+    setAtividades () {
+      console.log(this.desserts)
+      this.paramHoraNormalTotal = 0
+      this.paramsHoraNormalExtraTotal = 0
+      this.paramsHoraNormalNoturnaTotal = 0
+      this.paramsHoraExtraNoturnaTotal = 0
+      this.paramsHoraExtraFdsTotal = 0
+      this.dessertsAtividade = []
+
+      for (const item of this.desserts) {
+        this.paramHoraNormalTotal = this.paramHoraNormalTotal + item.horaNormalTotal
+        this.paramsHoraNormalExtraTotal = this.paramsHoraNormalExtraTotal + item.horaNormalExtraTotal
+        this.paramsHoraNormalNoturnaTotal = this.paramsHoraNormalNoturnaTotal + item.horaNormalNoturnaTotal
+        this.paramsHoraExtraNoturnaTotal = this.paramsHoraExtraNoturnaTotal + item.horaExtraNoturnaTotal
+        this.paramsHoraExtraFdsTotal = this.paramsHoraExtraFdsTotal + item.horaExtraFdsTotal
+      }
+
+      if (this.paramHoraNormalTotal > 0) {
+        this.dadosAtividades(this.paramHoraNormalTotal, 1)
+      }
+
+      if (this.paramsHoraNormalExtraTotal > 0) {
+        this.dadosAtividades(this.paramsHoraNormalExtraTotal, 2)
+      }
+
+      if (this.paramsHoraNormalNoturnaTotal > 0) {
+        this.dadosAtividades(this.paramsHoraNormalNoturnaTotal, 3)
+      }
+
+      if (this.paramsHoraExtraNoturnaTotal > 0) {
+        this.dadosAtividades(this.paramsHoraExtraNoturnaTotal, 4)
+      }
+
+      if (this.paramsHoraExtraFdsTotal > 0) {
+        this.dadosAtividades(this.paramsHoraExtraFdsTotal, 5)
+      }
+
+      console.log(this.dessertsAtividade)
+    },
+
+    dadosAtividades (paramQuantReal, item) {
+      let itemsAtiv = {}
+      console.log('servico', this.servico)
+      console.log('atividades', this.atividades)
+      const servicos = this.servico.split(' - ')[1]
+      console.log('servicos', servicos)
+      const objAtividade = this.atividades.filter(x => x.atividade === servicos)
+      const itemAtividade = objAtividade.filter(y => (y.item.toString().split('.')[1] * 1) === item)
+      console.log('itemAtividade', itemAtividade)
+      itemsAtiv = {
+        descricao: itemAtividade[0].descricao,
+        id: itemAtividade[0].item,
+        quantCont: itemAtividade[0].qtdCont,
+        realAcum: 0,
+        quantReal: paramQuantReal,
+        saldoCont: itemAtividade[0].qtdCont - paramQuantReal,
+        unidade: itemAtividade[0].unidade,
+        referencia: ''
+      }
+      this.dessertsAtividade.push(itemsAtiv)
+    },
+
+    async salvarHorarioNovo () {
+      const camposHora = await this.verificarCampoHora()
+      console.log(camposHora)
+      if (camposHora.length > 0) {
+        this.snackbar = true
+        this.mensagem = `Preencha o(s) Campo(s) ${camposHora.join(', ')}`
+        this.colorSnackbar = 'red'
+      } else {
+        const semanaSegSexta = ['Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira']
+
+        if (this.noturnoHorario) {
+          this.salvarHoraNoturno()
+          this.deleteHoraNormalSegSext()
+          this.deleteHoraExtraSegSext()
+        } else {
+          this.deleteHoraNoturnoNormal()
+          this.deleteHoraNoturnoExtra()
+        }
+
+        if (this.feriadoHorario) {
+          this.salvarHoraFDSFeriado()
+          this.deleteHoraNormalSegSext()
+          this.deleteHoraExtraSegSext()
+        } else {
+          this.deleteHoraFDSFeriado()
+        }
+
+        if (!this.noturnoHorario && !this.feriadoHorario) {
+          if (semanaSegSexta.includes(this.diaSemana)) {
+            this.salvarHoraSegSext()
+          } else {
+            this.salvarHoraFDSFeriado()
+          }
+        }
+        console.log(this.editedItem)
+        console.log(this.normalHorario, this.extraHorario, this.noturnoHorario, this.feriadoHorario)
+        this.salvarHoraEfetivo()
+      }
+    },
+
+    verificarCampoHora () {
+      const camposHora = []
+      if (this.horaInicioNovo < 1) {
+        camposHora.push('Hora Início')
+      }
+
+      if (this.horaFimNovo < 1) {
+        camposHora.push('Hora Fim')
+      }
+
+      return camposHora
+    },
+
+    horaNovo () {
+      this.horaInicioNovo = this.horaInicioNovo * 1
+      this.horaFimNovo = this.horaFimNovo * 1
+      this.horaTotalNovo = this.horaFimNovo - this.horaInicioNovo
+    },
+
+    horaExtraNovo () {
+      this.horaExtraInicioNovo = this.horaExtraInicioNovo * 1
+      this.horaExtraFimNovo = this.horaExtraFimNovo * 1
+      this.horaExtraTotalNovo = this.horaExtraFimNovo - this.horaExtraInicioNovo
+    },
+
+    deleteHoraNormalSegSext () {
+      this.editedItem.horaNormalInicio = 0
+      this.editedItem.horaNormalTermino = 0
+      this.editedItem.horaNormalTotal = 0
+    },
+
+    deleteHoraExtraSegSext () {
+      this.editedItem.horaNormalExtraInicio = 0
+      this.editedItem.horaNormalExtraTermino = 0
+      this.editedItem.horaNormalExtraTotal = 0
+    },
+
+    salvarHoraSegSext () {
+      if (this.normalHorario) {
+        this.editedItem.horaNormalInicio = this.horaInicioNovo * 1
+        this.editedItem.horaNormalTermino = this.horaFimNovo * 1
+        this.editedItem.horaNormalTotal = this.horaTotalNovo * 1
+      } else {
+        this.deleteHoraNormalSegSext()
+      }
+      if (this.extraHorario) {
+        this.editedItem.horaNormalExtraInicio = this.horaExtraInicioNovo * 1
+        this.editedItem.horaNormalExtraTermino = this.horaExtraFimNovo * 1
+        this.editedItem.horaNormalExtraTotal = this.horaExtraTotalNovo * 1
+      } else {
+        this.deleteHoraExtraSegSext()
+      }
+    },
+
+    deleteHoraNoturnoNormal () {
+      this.editedItem.horaNormalNoturnaInicio = 0
+      this.editedItem.horaNormalNoturnaTermino = 0
+      this.editedItem.horaNormalNoturnaTotal = 0
+    },
+
+    deleteHoraNoturnoExtra () {
+      this.editedItem.horaExtraNoturnaInicio = 0
+      this.editedItem.horaExtraNoturnaTermino = 0
+      this.editedItem.horaExtraNoturnaTotal = 0
+    },
+
+    salvarHoraNoturno () {
+      if (this.normalHorario) {
+        this.editedItem.horaNormalNoturnaInicio = this.horaInicioNovo * 1
+        this.editedItem.horaNormalNoturnaTermino = this.horaFimNovo * 1
+        this.editedItem.horaNormalNoturnaTotal = this.horaTotalNovo * 1
+      } else {
+        this.deleteHoraNoturnoNormal()
+      }
+      if (this.extraHorario) {
+        this.editedItem.horaExtraNoturnaInicio = this.horaExtraInicioNovo * 1
+        this.editedItem.horaExtraNoturnaTermino = this.horaExtraFimNovo * 1
+        this.editedItem.horaExtraNoturnaTotal = this.horaExtraTotalNovo * 1
+      } else {
+        this.deleteHoraNoturnoExtra()
+      }
+    },
+
+    deleteHoraFDSFeriado () {
+      this.editedItem.horaExtraFdsInicio = 0
+      this.editedItem.horaExtraFdsTermino = 0
+      this.editedItem.horaExtraFdsTotal = 0
+    },
+
+    salvarHoraFDSFeriado () {
+      this.editedItem.horaExtraFdsInicio = this.horaInicioNovo ? this.horaInicioNovo * 1 : this.horaExtraInicioNovo * 1
+      this.editedItem.horaExtraFdsTermino = this.horaFimNovo ? this.horaFimNovo * 1 : this.horaExtraFimNovo * 1
+      this.editedItem.horaExtraFdsTotal = this.horaTotalNovo ? this.horaTotalNovo * 1 : this.horaExtraTotalNovo * 1
+    },
+
+    adicionarReferencia (item) {
+      this.paramsAtividades = []
+      this.editedIndexReferencia = 0
+      this.modalAtividade = true
+      this.paramsAtividades = item
+      this.editedIndexReferencia = this.dessertsAtividade.indexOf(item)
+    },
+
+    salvarReferencia () {
+      Object.assign(this.dessertsAtividade[this.editedIndexReferencia], this.paramsAtividades)
+      this.modalAtividade = false
+      console.log(this.dessertsAtividade)
     }
 
   }

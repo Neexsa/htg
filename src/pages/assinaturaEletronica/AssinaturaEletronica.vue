@@ -105,7 +105,7 @@
                             >
                               <v-btn
                                 color="primary"
-                                @click="dialogAssinatura = true"
+                                @click="dialogAssinaturaNova = true"
                               >
                                 Mudar Assinatura
                               </v-btn>
@@ -158,6 +158,40 @@
       </v-dialog>
 
       <v-dialog
+        v-model="dialogAssinaturaNova"
+        transition="dialog-top-transition"
+        max-width="600"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >NOVA ASSINATURA</v-toolbar>
+            <v-card-text>
+              <div class="text-h4 pa-5">Faça a sua assinatura e salve.</div>
+              <vueSignature ref="signature" :sigOption="option" :w="'100%'" :h="'300px'" :disabled="disabled"></vueSignature>
+              <!-- <vueSignature ref="signature1" :sigOption="option"></vueSignature> -->
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn
+                class="color-btn-orange"
+                @click="clear"
+              >Limpar</v-btn>
+              <v-btn
+                class="color-btn-green"
+                @click="save()"
+              >Salvar</v-btn>
+              <v-btn
+                class="color-btn-close"
+                @click="dialogAssinaturaNova = false"
+              >Fechar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+
+      <v-dialog
         v-model="dialogoRespostaErro"
         width="500"
       >
@@ -201,16 +235,17 @@ import axios from 'axios'
 import { mapState } from 'vuex'
 import ModalRespostaErro from '../ComponeteGlobal/ModalRespostaErro.vue'
 import ModalRespostaCorreto from '../ComponeteGlobal/ModalRespostaCorreto.vue'
-import AWS from 'aws-sdk'
+// import AWS from 'aws-sdk'
+import vueSignature from 'vue-signature'
 export default {
-  components: { ModalRespostaErro, ModalRespostaCorreto },
+  components: { ModalRespostaErro, ModalRespostaCorreto, vueSignature },
   name: 'User',
   computed: {
     ...mapState('auth', ['user'])
   },
   data: () => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     senha: '',
     snackbar: false,
     colorSnackbar: '',
@@ -220,9 +255,16 @@ export default {
     show1: false,
     urlAssinatura: '',
     dialogAssinatura: false,
+    dialogAssinaturaNova: false,
     file: '',
     fileName: '',
-    idAws: 0
+    idAws: 0,
+    option: {
+      penColor: 'rgb(0, 0, 0)',
+      backgroundColor: '#EEEEEE'
+    },
+    disabled: false,
+    dataUrl: 'https://avatars2.githubusercontent.com/u/17644818?s=460&v=4'
   }),
   created () {
     try {
@@ -254,7 +296,7 @@ export default {
       this.idAws = result.data.id
     },
 
-    async submitFile () {
+    /* async submitFile () {
       var albumBucketName = 'neexsa-htg-pdfs-finalizados'
       var bucketRegion = 'sa-east-1'
       var IdentityPoolId = 'sa-east-1:5b531b25-81be-487d-a257-e748a8129073'
@@ -291,10 +333,72 @@ export default {
       )
 
       this.dialogAssinatura = false
-    },
+    }, */
 
     handleFileUpload () {
       this.file = this.$refs.file.files[0]
+    },
+
+    async save () {
+      try {
+        var _this = this
+        var png = _this.$refs.signature.save()
+        // var jpeg = _this.$refs.signature.save('image/jpeg')
+        // var svg = _this.$refs.signature.save('image/svg+xml')
+        console.log(png)
+        // console.log(jpeg)
+        // console.log(svg)
+
+        const params = {
+          image: png,
+          id: this.idAws
+        }
+        const result = await axios({
+          method: 'POST',
+          url: `${this.urlProd}upload-signature`,
+          data: params
+        })
+        console.log(result)
+        this.dialogAssinaturaNova = false
+        this.dialogoRespostaCorreto = true
+        this.assinaturaAws()
+      } catch (err) {
+        console.log(err)
+        this.dialogoRespostaErro = true
+      }
+    },
+
+    clear () {
+      var _this = this
+      _this.$refs.signature.clear()
+    },
+
+    undo () {
+      var _this = this
+      _this.$refs.signature.undo()
+    },
+
+    addWaterMark () {
+      var _this = this
+      _this.$refs.signature.addWaterMark({
+        text: 'mark text', // watermark text, > default ''
+        font: '20px Arial', // mark font, > default '20px sans-serif'
+        style: 'all', // fillText and strokeText,  'all'/'stroke'/'fill', > default 'fill
+        fillStyle: 'red', // fillcolor, > default '#333'
+        strokeStyle: 'blue', // strokecolor, > default '#333'
+        x: 100, // fill positionX, > default 20
+        y: 200, // fill positionY, > default 20
+        sx: 100, // stroke positionX, > default 40
+        sy: 200 // stroke positionY, > default 40
+      })
+    },
+    fromDataURL (url) {
+      var _this = this
+      _this.$refs.signature.fromDataURL('data:image/png;base64,iVBORw0K...')
+    },
+    handleDisabled () {
+      var _this = this
+      _this.disabled = !_this.disabled
     }
   }
 
@@ -338,5 +442,20 @@ export default {
   }
   .color-card {
     background-color: var(--light-gray)!important;
+  }
+
+  .color-btn-green {
+    color: white;
+    background-color: #4caf50 !important;
+  }
+
+  .color-btn-orange {
+    color: white;
+    background-color: #ff9800 !important;
+  }
+
+  .color-btn-close {
+    color: white;
+    background-color: #607d8b !important;
   }
 </style>

@@ -252,8 +252,8 @@ import NovoProjeto from './componente/NovoProjeto.vue'
 export default {
   components: { NovoProjeto },
   data: vm => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     date: '',
     dateFormatted: '',
     menu: false,

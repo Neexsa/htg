@@ -296,6 +296,103 @@
                             </v-text-field>
                           </v-col>
                         </v-row>
+                        <v-row class="px-5 d-flex justify-center pt-5">
+                          <v-col
+                            cols="12"
+                            sm="12"
+                            md="12"
+                            lg="12"
+                            xs="12"
+                            style="text-align:center"
+                          >
+                          <span>ATIVIDADES DO PROJETO</span>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="4"
+                            md="4"
+                            lg="4"
+                            xs="4"
+                            style="text-align:center"
+                          >
+                            <v-text-field
+                              v-model="labelAtividades"
+                              solo
+                              label="Atividades do Projeto"
+                              hint="Digite as Atividades do Projeto"
+                            >
+                            </v-text-field>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="1"
+                            md="1"
+                            lg="1"
+                            xs="1"
+                            style="text-align:center"
+                          >
+                          <v-btn
+                            class="mx-2"
+                            fab
+                            dark
+                            small
+                            color="indigo"
+                            @click="adicionarProjeto()"
+                          >
+                            <v-icon dark>
+                              mdi-plus
+                            </v-icon>
+                          </v-btn>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="7"
+                            md="7"
+                            lg="7"
+                            xs="7"
+                          >
+                          <v-chip
+                            v-for="item in atividadesProjeto"
+                            :key="item"
+                            class="ma-2"
+                            close
+                            color="primary"
+                            @click:close="closeChip(item)"
+                          >
+                          {{item}}
+                          </v-chip>
+                          </v-col>
+                        </v-row>
+                        <v-row class="px-5 d-flex justify-center pt-5">
+                          <v-col
+                            cols="12"
+                            sm="12"
+                            md="12"
+                            lg="12"
+                            xs="12"
+                          >
+                          <v-data-table
+                            :headers="headers"
+                            :items="desserts"
+                            class="elevation-1"
+                            style="text-align:center"
+                          >
+                            <template v-slot:[`item.editarTabela`]="{ item }">
+                              <v-btn
+                                width="30px"
+                                height="30px"
+                                fab
+                                dark
+                                small
+                                color="primary"
+                                @click="editarAtividades(item)"
+                              >
+                                <v-icon dark small>mdi-pencil</v-icon>
+                              </v-btn>
+                            </template>
+                          </v-data-table>
+                          </v-col>
+                        </v-row>
                       </v-card>
                     </v-col>
                   </v-row>
@@ -318,6 +415,110 @@
           </v-flex>
         </v-layout>
       </v-container>
+
+      <v-dialog
+        v-model="modalAtividades"
+        transition="dialog-top-transition"
+        max-width="600"
+      >
+        <template>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >EDITAR ATIVIDADE</v-toolbar>
+            <v-card-text>
+              <v-form
+                ref="form"
+              >
+                  <v-container fluid>
+                  <v-row class="pt-5">
+                    <v-col
+                      cols="12"
+                      sm="2"
+                      md="2"
+                    >
+                    <h4>Item</h4>
+                    <v-text-field
+                      v-model="itemAtividade.item"
+                      readonly
+                    ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="8"
+                      md="8"
+                    >
+                    <h4>Atividade</h4>
+                    <v-text-field
+                      v-model="itemAtividade.descricao"
+                      readonly
+                    ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="2"
+                      md="2"
+                    >
+                    <h4>Unidade</h4>
+                    <v-text-field
+                      v-model="itemAtividade.unidade"
+                    ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                    >
+                    <h4>Quant. Contratada</h4>
+                    <v-text-field
+                      v-model="itemAtividade.qtdCont"
+                      @change="totalMedido()"
+                    ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                    >
+                    <h4>Valor Unidade</h4>
+                    <v-text-field
+                      v-model="itemAtividade.valorUnit"
+                      @change="totalMedido()"
+                    ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="4"
+                      md="4"
+                    >
+                    <h4>Total Medido</h4>
+                    <v-text-field
+                      disabled
+                      v-model="itemAtividade.totalMed"
+                    ></v-text-field>
+                    </v-col>
+                  </v-row>
+                  </v-container>
+              </v-form>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="modalAtividades = false"
+              >Fechar</v-btn>
+              <v-btn
+                color="green"
+                text
+                @click="salvarAtividade(itemAtividade)"
+              >Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+
       <v-snackbar
         v-model="snackbar"
         :color="colorSnackbar"
@@ -331,7 +532,7 @@
             v-bind="attrs"
             @click="snackbar = false"
           >
-            Close
+            Fechar
           </v-btn>
         </template>
       </v-snackbar>
@@ -352,12 +553,14 @@ export default {
       this.nomeClienteAdicionar = this.projetoEdit.cliente
       this.novoNomeProjeto = this.projetoEdit.nome
       this.prorrogacao = this.projetoEdit.prorrogacao
+      this.atividadesProjeto = this.projetoEdit.atividadesProjeto
+      this.desserts = this.projetoEdit.atividades
       this.ajusteInformacoes()
     }
   },
   data: vm => ({
-    urlProd: 'https://htgneexsa.cf/api_htg/',
-    // urlProd: 'http://localhost:4040/api_htg/',
+    // urlProd: 'https://htgneexsa.cf/api_htg/',
+    urlProd: 'http://localhost:4040/api_htg/',
     mensagem: '',
     snackbar: false,
     colorSnackbar: '',
@@ -375,6 +578,25 @@ export default {
     diasDeAtrazos: 0,
     clientes: [],
     camposVerificados: [],
+    atividadesProjeto: [],
+    labelAtividades: '',
+    modalAtividades: false,
+    itemAtividade: [],
+    editedIndex: 0,
+    headers: [
+      {
+        text: 'Item',
+        align: 'start',
+        value: 'item'
+      },
+      { text: 'Descrição', value: 'descricao' },
+      { text: 'UN', align: 'center', value: 'unidade' },
+      { text: 'QTD. CONT.', align: 'center', value: 'qtdCont' },
+      { text: 'VALOR UNIT', align: 'center', value: 'valorUnit' },
+      { text: 'TOTAL MED', align: 'center', value: 'totalMed' },
+      { text: 'Editar', align: 'center', value: 'editarTabela' }
+    ],
+    desserts: [],
     rules: {
       required: value => !!value || 'Obrigatório.',
       email: value => {
@@ -410,6 +632,10 @@ export default {
       if (this.nomeClienteAdicionar.length < 1) {
         this.camposVerificados.push('Nome Cliente')
       }
+
+      if (this.atividadesProjeto.length < 1) {
+        this.camposVerificados.push('Atividades do Projeto')
+      }
       this.salvarProjeto()
     },
 
@@ -423,7 +649,9 @@ export default {
           dataInicio: dataInicio,
           dataFim: dataFim,
           prorrogacao: this.prorrogacao ? this.prorrogacao : 0,
-          idProjeto: this.idProjeto
+          idProjeto: this.idProjeto,
+          atividadesProjeto: this.atividadesProjeto,
+          atividadesObj: this.desserts
         }
         if (this.tipoProjeto === 'editar') {
           try {
@@ -481,17 +709,95 @@ export default {
       // Dias Decorridos
       this.diasDecorridos = this.calculaInformacoes(momentAgora, dataAgora)
 
-      // Dias Restantes
-      this.diasRestantes = this.calculaInformacoes(dataAgora, momentProrrogacao)
+      if (momentDepois > dataAgora) {
+        // Dias Restantes
+        this.diasRestantes = this.calculaInformacoes(dataAgora, momentProrrogacao)
+      } else {
+        this.diasRestantes = 0
+      }
 
-      // Dias Atrazo
-      this.diasDeAtrazos = this.calculaInformacoes(momentProrrogacao, dataAgora)
+      if (momentDepois > dataAgora) {
+        this.diasDeAtrazos = 0
+      } else {
+        // Dias Atrazo
+        this.diasDeAtrazos = this.calculaInformacoes(momentProrrogacao, dataAgora)
+      }
     },
 
     calculaInformacoes (dateAntes, dateDepois) {
       var timeDiff = Math.abs(dateAntes - dateDepois)
       var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24))
       return diffDays
+    },
+
+    adicionarProjeto () {
+      const array = this.atividadesProjeto.map(x => { return x.toUpperCase() })
+      if (array.includes(this.labelAtividades.toUpperCase())) {
+        this.snackbar = true
+        this.mensagem = 'Atividade já adicionada'
+        this.colorSnackbar = 'red'
+        this.labelAtividades = ''
+      } else if (this.labelAtividades === '') {
+        this.snackbar = true
+        this.mensagem = 'Atividade vazia'
+        this.colorSnackbar = 'red'
+        this.labelAtividades = ''
+      } else {
+        this.atividadesProjeto.push(this.labelAtividades)
+        this.ajustarTabela()
+        this.labelAtividades = ''
+      }
+    },
+    closeChip (item) {
+      console.log(item)
+      this.atividadesProjeto.splice(this.atividadesProjeto.indexOf(item), 1)
+      console.log(this.atividadesProjeto)
+      this.ajustarTabela()
+    },
+    ajustarTabela () {
+      this.desserts = []
+      let aux = 0
+      let auxDec = 0
+      for (const item of this.atividadesProjeto) {
+        aux = aux + 1
+        auxDec = 0
+        console.log(item)
+        const arrayDesc = ['Hora normal diurna', 'Hora extra diurna', 'Hora normal noturna', 'Hora extra noturna', 'Hora extra diurna fim de semana/feriado', 'Hora extra noturna fim de semanasemana/feriado']
+        for (const itemDesc of arrayDesc) {
+          auxDec = auxDec + 1
+          const auxItem = `${aux}.${auxDec}`
+          const params = {
+            item: parseFloat(auxItem),
+            descricao: `${itemDesc} - ${item}`,
+            atividade: item,
+            unidade: 'HH',
+            qtdCont: 0,
+            valorUnit: 0,
+            totalMed: 0
+          }
+          console.log(params)
+          this.desserts.push(params)
+        }
+      }
+    },
+
+    editarAtividades (item) {
+      this.itemAtividade = []
+      this.editedIndex = 0
+      this.itemAtividade = item
+      this.editedIndex = this.desserts.indexOf(item)
+      this.modalAtividades = true
+    },
+
+    totalMedido () {
+      this.itemAtividade.qtdCont = this.itemAtividade.qtdCont * 1
+      this.itemAtividade.valorUnit = this.itemAtividade.valorUnit * 1
+      this.itemAtividade.totalMed = this.itemAtividade.qtdCont * this.itemAtividade.valorUnit
+    },
+
+    salvarAtividade (item) {
+      Object.assign(this.desserts[this.editedIndex], item)
+      this.modalAtividades = false
     }
   }
 }
